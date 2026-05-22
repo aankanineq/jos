@@ -11,7 +11,14 @@ function formDataToPayload(formData: FormData): CreateWorkoutPayload {
 
   const distanceRaw = formData.get('running_distance_km')
   const durationRaw = formData.get('running_duration_sec')
-  const paceRaw = formData.get('running_pace_sec_per_km')
+
+  const running_distance_km = distanceRaw ? Number(distanceRaw) : null
+  const running_duration_sec = durationRaw ? Number(durationRaw) : null
+  let running_pace_sec_per_km = null
+
+  if (type === 'Running' && running_distance_km && running_duration_sec) {
+    running_pace_sec_per_km = Math.round(running_duration_sec / running_distance_km)
+  }
 
   return {
     workout_date: formData.get('workout_date') as string,
@@ -20,9 +27,9 @@ function formDataToPayload(formData: FormData): CreateWorkoutPayload {
     title: formData.get('title') as string || null,
     markdown: formData.get('markdown') as string || '',
     notes: formData.get('notes') as string || null,
-    running_distance_km: distanceRaw ? Number(distanceRaw) : null,
-    running_duration_sec: durationRaw ? Number(durationRaw) : null,
-    running_pace_sec_per_km: paceRaw ? Number(paceRaw) : null,
+    running_distance_km,
+    running_duration_sec,
+    running_pace_sec_per_km,
     running_intensity: (formData.get('running_intensity') as RunningIntensity) || null,
   }
 }

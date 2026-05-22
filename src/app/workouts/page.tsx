@@ -68,7 +68,12 @@ export default async function WorkoutsListPage() {
                     {w.type === 'Running' && w.running_distance_km ? (
                       <p className="text-sm font-semibold text-slate-500">
                         🏃 {w.running_distance_km}km
-                        {w.running_duration_sec && ` • ⏱️ ${Math.floor(w.running_duration_sec / 60)}분 ${w.running_duration_sec % 60}초`}
+                        {w.running_duration_sec && (() => {
+                          const h = Math.floor(w.running_duration_sec / 3600)
+                          const m = Math.floor((w.running_duration_sec % 3600) / 60).toString().padStart(2, '0')
+                          const s = (w.running_duration_sec % 60).toString().padStart(2, '0')
+                          return ` • ⏱️ ${h}:${m}:${s}`
+                        })()}
                       </p>
                     ) : (
                       <p className="text-sm text-slate-500 line-clamp-1 max-w-md font-semibold">

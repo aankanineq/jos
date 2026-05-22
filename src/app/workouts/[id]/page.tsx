@@ -89,7 +89,12 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
                     <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
                       <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">시간</p>
                       <p className="text-base min-[375px]:text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap">
-                        {Math.floor(workout.running_duration_sec / 60)}<span className="text-[10px] sm:text-xs font-semibold text-slate-400">분</span> {workout.running_duration_sec % 60}<span className="text-[10px] sm:text-xs font-semibold text-slate-400">초</span>
+                        {(() => {
+                          const h = Math.floor(workout.running_duration_sec / 3600)
+                          const m = Math.floor((workout.running_duration_sec % 3600) / 60).toString().padStart(2, '0')
+                          const s = (workout.running_duration_sec % 60).toString().padStart(2, '0')
+                          return `${h}:${m}:${s}`
+                        })()}
                       </p>
                     </div>
                   )}

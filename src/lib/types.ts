@@ -8,7 +8,7 @@ export type WorkoutType =
   | 'Rest'
   | 'Other'
 
-export type WorkoutStatus = 'planned' | 'completed' | 'skipped'
+export type WorkoutStatus = 'planned' | 'completed'
 export type RunningIntensity = 'easy' | 'long' | 'tempo' | 'interval' | 'race' | 'unknown'
 
 export type WorkoutEntry = {

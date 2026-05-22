@@ -412,7 +412,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
               <textarea
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
-                placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;running_duration_sec: 2160&#10;&#10;여기에 운동 일지 본문 마크다운 내용을 붙여넣으세요...&#10;---"
+                placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;&#10;여기에 운동 일지 본문 마크다운 내용을 붙여넣으세요...&#10;---"
                 className="w-full min-h-[220px] bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-300"
               />
               
@@ -515,8 +515,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 {`## 2026-05-21 Running
 status: completed
 running_distance_km: 6.0
-running_duration_sec: 2160
-running_pace_sec_per_km: 360
+duration: 0:36:00
 
 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.
 

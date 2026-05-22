@@ -14,6 +14,7 @@ interface ParsedWorkout {
   running_intensity: string | null
   notes: string | null
   lineNum: number
+  invalidDurationFormat?: string | null
 }
 
 function parseMarkdownWorkouts(text: string): ParsedWorkout[] {
@@ -68,7 +69,8 @@ function parseMarkdownWorkouts(text: string): ParsedWorkout[] {
         running_pace_sec_per_km: null,
         running_intensity: null,
         notes: null,
-        lineNum: i + 1
+        lineNum: i + 1,
+        invalidDurationFormat: null
       }
       capturingMarkdown = false
     } else if (currentWorkout) {
@@ -97,19 +99,32 @@ function parseMarkdownWorkouts(text: string): ParsedWorkout[] {
           value = value.replace(/[\*_]/g, '')
 
           if (key === 'status') {
-            currentWorkout.status = value
+            // Map "complete" to "completed" for standard database compatibility
+            currentWorkout.status = value === 'complete' ? 'completed' : value
           } else if (key === 'running_distance_km') {
             currentWorkout.running_distance_km = Number(value)
-          } else if (key === 'running_duration_sec') {
-            currentWorkout.running_duration_sec = parseInt(value, 10)
-          } else if (key === 'running_pace_sec_per_km') {
-            currentWorkout.running_pace_sec_per_km = parseInt(value, 10)
+          } else if (key === 'duration' || key === 'running_duration' || key === 'running_duration_sec') {
+            // Parse duration format H:MM:SS or HH:MM:SS (always require all 3 fields)
+            const durationRegex = /^(\d{1,2}):(\d{2}):(\d{2})$/
+            const match = value.match(durationRegex)
+            if (match) {
+              const h = parseInt(match[1], 10)
+              const m = parseInt(match[2], 10)
+              const s = parseInt(match[3], 10)
+              currentWorkout.running_duration_sec = h * 3600 + m * 60 + s
+            } else {
+              // Store invalid text value for detailed error report
+              currentWorkout.invalidDurationFormat = value
+            }
           } else if (key === 'running_intensity') {
             currentWorkout.running_intensity = value
           } else if (key === 'title') {
             currentWorkout.title = value
           } else if (key === 'notes') {
             currentWorkout.notes = value
+          } else if (key === 'running_pace_sec_per_km') {
+            // Explicitly ignore pace as an input as it is calculated automatically
+            continue
           } else {
             // Unknown property, treat as start of markdown body
             capturingMarkdown = true
@@ -131,9 +146,14 @@ function parseMarkdownWorkouts(text: string): ParsedWorkout[] {
     parsedWorkouts.push(currentWorkout)
   }
 
-  // Trim all final markdown strings
+  // Trim final markdown strings and auto-calculate pace
   parsedWorkouts.forEach(w => {
     w.markdown = w.markdown.trim()
+    
+    // Auto-calculate pace: Pace = Duration (seconds) / Distance (km)
+    if (w.type === 'Running' && w.running_distance_km && w.running_duration_sec) {
+      w.running_pace_sec_per_km = Math.round(w.running_duration_sec / w.running_distance_km)
+    }
   })
 
   return parsedWorkouts
@@ -175,7 +195,7 @@ export async function POST(request: NextRequest) {
   const errors: string[] = []
 
   const validTypes = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other']
-  const validStatuses = ['planned', 'completed', 'skipped']
+  const validStatuses = ['planned', 'completed'] // Require complete or planned only (no skipped)
   const validIntensities = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
 
   for (const pw of parsedWorkouts) {
@@ -191,13 +211,31 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    // 3. Validate Status
+    // 3. Validate Running specific conditions
+    if (pw.type === 'Running') {
+      if (pw.invalidDurationFormat) {
+        errors.push(`라인 ${pw.lineNum}: 러닝 전체 시간(duration) 형식이 올바르지 않습니다. 생략 없이 반드시 H:MM:SS 형식이어야 합니다. (입력값: "${pw.invalidDurationFormat}")`)
+        continue
+      }
+      
+      // Require both distance and duration if one is supplied
+      if (pw.running_distance_km && !pw.running_duration_sec) {
+        errors.push(`라인 ${pw.lineNum}: 러닝 거리는 있으나 시간(duration: H:MM:SS)이 누락되었습니다.`)
+        continue
+      }
+      if (pw.running_duration_sec && !pw.running_distance_km) {
+        errors.push(`라인 ${pw.lineNum}: 러닝 시간은 있으나 거리(running_distance_km)가 누락되었습니다.`)
+        continue
+      }
+    }
+
+    // 4. Validate Status (Planned or Completed only)
     if (!validStatuses.includes(pw.status)) {
-      errors.push(`라인 ${pw.lineNum}: 알 수 없는 상태값입니다. (${pw.status})`)
+      errors.push(`라인 ${pw.lineNum}: 알 수 없는 상태값입니다. ("complete" 또는 "planned"만 허용됩니다. 입력값: "${pw.status}")`)
       continue
     }
 
-    // 4. Validate Running Intensity
+    // 5. Validate Running Intensity
     if (pw.running_intensity && !validIntensities.includes(pw.running_intensity)) {
       errors.push(`라인 ${pw.lineNum}: 알 수 없는 러닝 강도입니다. (${pw.running_intensity})`)
       continue

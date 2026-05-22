@@ -16,8 +16,11 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const initialDuration = initialData?.running_duration_sec || 0
+  const [runningHour, setRunningHour] = useState<string>(
+    initialDuration ? Math.floor(initialDuration / 3600).toString() : ''
+  )
   const [runningMin, setRunningMin] = useState<string>(
-    initialDuration ? Math.floor(initialDuration / 60).toString() : ''
+    initialDuration ? Math.floor((initialDuration % 3600) / 60).toString() : ''
   )
   const [runningSec, setRunningSec] = useState<string>(
     initialDuration ? (initialDuration % 60).toString() : ''
@@ -53,7 +56,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   }
 
   const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other']
-  const statuses: WorkoutStatus[] = ['planned', 'completed', 'skipped']
+  const statuses: WorkoutStatus[] = ['planned', 'completed']
   const intensities: RunningIntensity[] = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
 
   return (
@@ -123,11 +126,21 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500">전체 시간</label>
+              <label className="text-xs font-semibold text-slate-500">전체 시간 (시간:분:초)</label>
               <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min="0"
+                  placeholder="시"
+                  value={runningHour}
+                  onChange={(e) => setRunningHour(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm text-center font-bold"
+                />
+                <span className="text-xs font-bold text-slate-400">시</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
                   placeholder="분"
                   value={runningMin}
                   onChange={(e) => setRunningMin(e.target.value)}
@@ -146,7 +159,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
                 <span className="text-xs font-bold text-slate-400">초</span>
               </div>
               {/* Hidden input to submit the total duration in seconds */}
-              <input type="hidden" name="running_duration_sec" value={(Number(runningMin) * 60 + Number(runningSec)) || ''} />
+              <input type="hidden" name="running_duration_sec" value={(Number(runningHour) * 3600 + Number(runningMin) * 60 + Number(runningSec)) || ''} />
             </div>
           </div>
         </div>
