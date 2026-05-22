@@ -15,6 +15,14 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
+  const initialDuration = initialData?.running_duration_sec || 0
+  const [runningMin, setRunningMin] = useState<string>(
+    initialDuration ? Math.floor(initialDuration / 60).toString() : ''
+  )
+  const [runningSec, setRunningSec] = useState<string>(
+    initialDuration ? (initialDuration % 60).toString() : ''
+  )
+
   const isEditing = !!initialData
   const defaultDate = initialData?.workout_date || initialDate || format(new Date(), 'yyyy-MM-dd')
 
@@ -102,7 +110,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
       {type === 'Running' && (
         <div className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 space-y-4">
           <h3 className="font-bold text-slate-800 text-sm tracking-wide">🏃 러닝 추가 정보</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-500">거리 (km)</label>
               <input
@@ -115,26 +123,30 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500">시간 (초)</label>
-              <input
-                type="number"
-                min="0"
-                name="running_duration_sec"
-                defaultValue={initialData?.running_duration_sec || ''}
-                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-500">강도</label>
-              <select
-                name="running_intensity"
-                defaultValue={initialData?.running_intensity || 'easy'}
-                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm"
-              >
-                {intensities.map((i) => (
-                  <option key={i} value={i} className="bg-white text-slate-900">{i}</option>
-                ))}
-              </select>
+              <label className="text-xs font-semibold text-slate-500">전체 시간</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="분"
+                  value={runningMin}
+                  onChange={(e) => setRunningMin(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm text-center font-bold"
+                />
+                <span className="text-xs font-bold text-slate-400">분</span>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  placeholder="초"
+                  value={runningSec}
+                  onChange={(e) => setRunningSec(e.target.value)}
+                  className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm text-center font-bold"
+                />
+                <span className="text-xs font-bold text-slate-400">초</span>
+              </div>
+              {/* Hidden input to submit the total duration in seconds */}
+              <input type="hidden" name="running_duration_sec" value={(Number(runningMin) * 60 + Number(runningSec)) || ''} />
             </div>
           </div>
         </div>

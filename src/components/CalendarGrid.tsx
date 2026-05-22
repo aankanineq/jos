@@ -134,13 +134,6 @@ export default function CalendarGrid({ workouts }: Props) {
                   {format(day, dateFormat)}
                 </span>
               </div>
-
-              {/* Running Distance or other stat overlay at bottom right */}
-              {dayWorkouts.some(w => w.type === 'Running' && w.running_distance_km) && (
-                <span className="absolute bottom-0.5 right-0.5 text-[7.5px] sm:text-[9px] font-black px-1 py-0.2 bg-slate-900 text-white border border-slate-800 rounded shadow-sm z-10">
-                  🏃 {dayWorkouts.filter(w => w.type === 'Running').reduce((acc, curr) => acc + (curr.running_distance_km || 0), 0).toFixed(1)}k
-                </span>
-              )}
             </Link>
           )
         })}
