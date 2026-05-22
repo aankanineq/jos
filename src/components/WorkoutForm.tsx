@@ -7,19 +7,31 @@ import { format } from 'date-fns'
 
 interface Props {
   initialData?: WorkoutEntry
+  initialDate?: string
 }
 
-export default function WorkoutForm({ initialData }: Props) {
+export default function WorkoutForm({ initialData, initialDate }: Props) {
   const [type, setType] = useState<WorkoutType>(initialData?.type || 'Pull')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const isEditing = !!initialData
-  const defaultDate = initialData?.workout_date || format(new Date(), 'yyyy-MM-dd')
+  const defaultDate = initialData?.workout_date || initialDate || format(new Date(), 'yyyy-MM-dd')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setErrorMsg(null)
+    
     const formData = new FormData(e.currentTarget)
+    const markdownVal = (formData.get('markdown') as string || '').trim()
+    
+    if (type !== 'Rest' && !markdownVal) {
+      setErrorMsg('운동 기록(Markdown)을 입력해주세요. (빈 기록은 저장할 수 없습니다.)')
+      setIsSubmitting(false)
+      return
+    }
+    
     try {
       if (isEditing) {
         await editWorkoutAction(initialData!.id, formData)
@@ -135,11 +147,18 @@ export default function WorkoutForm({ initialData }: Props) {
         <textarea
           name="markdown"
           rows={8}
+          required={type !== 'Rest'}
           defaultValue={initialData?.markdown || ''}
           placeholder={`## 풀업\nBW 10 10 10\n\n## 시티드로우\n50kg 12 10 10`}
           className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 font-mono text-sm leading-relaxed transition-all"
         />
       </div>
+
+      {errorMsg && (
+        <p className="p-3.5 bg-red-950/30 border border-red-500/20 text-red-300 text-xs font-semibold text-center rounded-xl animate-shake">
+          {errorMsg}
+        </p>
+      )}
 
       <div className="pt-4 flex justify-end gap-4 border-t border-white/5">
         <button
