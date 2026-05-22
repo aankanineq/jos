@@ -69,7 +69,7 @@ export default function CalendarGrid({ workouts }: Props) {
       {/* Weekday headers */}
       <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/20">
         {weekDays.map((day) => (
-          <div key={day} className="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-wider">
+          <div key={day} className="py-2 sm:py-3 text-center text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-tight sm:tracking-wider">
             {day}
           </div>
         ))}
@@ -88,7 +88,7 @@ export default function CalendarGrid({ workouts }: Props) {
             <Link
               key={day.toString()}
               href={`/workouts/${dateStr}`}
-              className={`min-h-[90px] sm:min-h-[110px] p-3 rounded-2xl transition-all duration-200 relative group flex flex-col justify-between m-1 overflow-hidden border isolate ${
+              className={`min-h-[72px] min-[375px]:min-h-[85px] sm:min-h-[110px] p-1 min-[375px]:p-2 sm:p-3 rounded-xl sm:rounded-2xl transition-all duration-200 relative group flex flex-col justify-between m-0.5 min-[375px]:m-1 overflow-hidden border isolate ${
                 dayWorkouts.length > 0 
                   ? 'border-slate-200 bg-slate-50/30 hover:bg-slate-50/70 hover:shadow-sm' 
                   : 'border-slate-100 hover:border-slate-200 bg-white hover:shadow-sm'
@@ -98,7 +98,7 @@ export default function CalendarGrid({ workouts }: Props) {
             >
               {/* Split Workout Gradients Background */}
               {dayWorkouts.length > 0 && (
-                <div className="absolute inset-1.5 flex flex-col gap-1 -z-10 overflow-hidden">
+                <div className="absolute inset-0.5 min-[375px]:inset-1 sm:inset-1.5 flex flex-col gap-0.5 min-[375px]:gap-1 -z-10 overflow-hidden">
                   {dayWorkouts.map((w) => {
                     const normType = w.type.charAt(0).toUpperCase() + w.type.slice(1).toLowerCase()
                     const theme = workoutThemes[normType] || workoutThemes['Other']
@@ -108,12 +108,12 @@ export default function CalendarGrid({ workouts }: Props) {
                     return (
                       <div
                         key={w.id}
-                        className={`flex-1 flex items-center justify-center rounded-lg border ${theme.bg} ${theme.border} ${theme.text} px-2 transition-all ${
+                        className={`flex-1 flex items-center justify-center rounded min-[375px]:rounded-lg border ${theme.bg} ${theme.border} ${theme.text} px-0.5 min-[375px]:px-1.5 transition-all ${
                           isCompleted ? 'opacity-100 shadow-sm' : isPlanned ? 'opacity-60 animate-pulse' : 'opacity-40'
                         }`}
                         title={`${w.type} (${w.status})`}
                       >
-                        <span className="text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider select-none truncate whitespace-nowrap">
+                        <span className="text-[7.5px] min-[375px]:text-[8.5px] min-[400px]:text-[9.5px] sm:text-[11px] font-black uppercase tracking-tight sm:tracking-wider select-none truncate whitespace-nowrap">
                           {displayLabel}
                         </span>
                       </div>
@@ -124,7 +124,7 @@ export default function CalendarGrid({ workouts }: Props) {
 
               {/* Day number */}
               <div className="flex justify-between items-start z-10">
-                <span className={`text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-md transition-all ${
+                <span className={`text-[8.5px] sm:text-[10px] font-black w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center rounded transition-all ${
                   isTodayDate
                     ? 'bg-slate-900 text-white shadow-sm'
                     : dayWorkouts.length > 0
@@ -137,7 +137,7 @@ export default function CalendarGrid({ workouts }: Props) {
 
               {/* Running Distance or other stat overlay at bottom right */}
               {dayWorkouts.some(w => w.type === 'Running' && w.running_distance_km) && (
-                <span className="absolute bottom-2 right-2 text-[9px] font-black px-1.5 py-0.5 bg-slate-900 text-white border border-slate-800 rounded-md shadow-sm z-10">
+                <span className="absolute bottom-0.5 right-0.5 text-[7.5px] sm:text-[9px] font-black px-1 py-0.2 bg-slate-900 text-white border border-slate-800 rounded shadow-sm z-10">
                   🏃 {dayWorkouts.filter(w => w.type === 'Running').reduce((acc, curr) => acc + (curr.running_distance_km || 0), 0).toFixed(1)}k
                 </span>
               )}

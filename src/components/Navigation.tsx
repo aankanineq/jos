@@ -60,7 +60,7 @@ export default function Navigation() {
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="sm:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-100 z-50 pb-safe">
+      <nav className="sm:hidden fixed bottom-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-100 z-50 pb-[env(safe-area-inset-bottom,16px)]">
         <div className="flex items-center justify-around h-16 px-2">
           {navItems.map((item) => {
             const Icon = item.icon
@@ -83,7 +83,7 @@ export default function Navigation() {
       </nav>
 
       {/* Mobile FAB for Add Workout */}
-      <div className="sm:hidden fixed bottom-20 right-4 z-50">
+      <div className="sm:hidden fixed bottom-[calc(76px+env(safe-area-inset-bottom,16px))] right-4 z-50">
         <Link
           href="/workouts/new"
           className="flex items-center justify-center w-14 h-14 bg-slate-900 text-white rounded-2xl shadow-md hover:bg-slate-800 active:scale-95 transition-all duration-300"

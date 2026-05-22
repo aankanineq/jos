@@ -76,25 +76,27 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
 
               {/* Running specific info */}
               {workout.type === 'Running' && (
-                <div className="px-5 sm:px-6 py-4 bg-slate-50/30 border-b border-slate-100 grid grid-cols-3 gap-6 text-center">
+                <div className="px-3 sm:px-6 py-3 sm:py-4 bg-slate-50/30 border-b border-slate-100 grid grid-cols-3 gap-2 sm:gap-4 md:gap-6 text-center">
                   {workout.running_distance_km !== null && (
-                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
-                      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">거리</p>
-                      <p className="text-xl font-extrabold text-slate-900">{workout.running_distance_km} <span className="text-xs font-semibold text-slate-400">km</span></p>
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">거리</p>
+                      <p className="text-base min-[375px]:text-lg sm:text-xl font-extrabold text-slate-900">
+                        {workout.running_distance_km} <span className="text-[10px] sm:text-xs font-semibold text-slate-400">km</span>
+                      </p>
                     </div>
                   )}
                   {workout.running_duration_sec !== null && (
-                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
-                      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">시간</p>
-                      <p className="text-xl font-extrabold text-slate-900">
-                        {Math.floor(workout.running_duration_sec / 60)}<span className="text-xs font-semibold text-slate-400">분</span> {workout.running_duration_sec % 60}<span className="text-xs font-semibold text-slate-400">초</span>
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">시간</p>
+                      <p className="text-base min-[375px]:text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap">
+                        {Math.floor(workout.running_duration_sec / 60)}<span className="text-[10px] sm:text-xs font-semibold text-slate-400">분</span> {workout.running_duration_sec % 60}<span className="text-[10px] sm:text-xs font-semibold text-slate-400">초</span>
                       </p>
                     </div>
                   )}
                   {workout.running_intensity && (
-                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
-                      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">강도</p>
-                      <p className="text-base font-black text-orange-600 capitalize pt-0.5">{workout.running_intensity}</p>
+                    <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">강도</p>
+                      <p className="text-sm min-[375px]:text-base font-black text-orange-600 capitalize pt-0.5">{workout.running_intensity}</p>
                     </div>
                   )}
                 </div>

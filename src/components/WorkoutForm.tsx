@@ -49,7 +49,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const intensities: RunningIntensity[] = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-6 sm:p-8 bg-white border border-slate-100">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-4 min-[390px]:p-6 sm:p-8 bg-white border border-slate-100">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <label className="text-sm font-bold text-slate-700 tracking-wide">날짜</label>
