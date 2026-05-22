@@ -78,38 +78,57 @@ export default function CalendarGrid({ workouts }: Props) {
             <Link
               key={day.toString()}
               href={`/workouts/${dateStr}`}
-              className={`min-h-[90px] sm:min-h-[110px] p-2 border-b border-r border-white/5 hover:bg-white/[0.02] transition-all relative group flex flex-col justify-between ${
-                !isCurrentMonth ? 'bg-slate-950/40 opacity-30 pointer-events-none' : ''
-              } ${isTodayDate ? 'bg-orange-500/5' : ''}`}
+              className={`min-h-[90px] sm:min-h-[110px] p-3 rounded-2xl transition-all duration-300 relative group flex flex-col justify-between m-1 overflow-hidden border isolate ${
+                dayWorkouts.length > 0 
+                  ? 'border-white/10 shadow-lg hover:scale-102 hover:shadow-[0_8px_20px_-5px_rgba(0,0,0,0.8)]' 
+                  : 'border-white/5 hover:border-white/10 bg-slate-900/30'
+              } ${
+                !isCurrentMonth ? 'opacity-20 pointer-events-none' : ''
+              } ${isTodayDate ? 'ring-2 ring-orange-500/50' : ''}`}
             >
+              {/* Split Workout Gradients Background */}
+              {dayWorkouts.length > 0 && (
+                <div className="absolute inset-1.5 flex gap-1 -z-10 overflow-hidden">
+                  {dayWorkouts.map((w) => {
+                    const grad = gradientMap[w.type] || gradientMap['Other']
+                    const isCompleted = w.status === 'completed'
+                    const isPlanned = w.status === 'planned'
+                    return (
+                      <div
+                        key={w.id}
+                        className={`flex-1 h-full bg-gradient-to-br ${grad} rounded-xl relative flex items-center justify-center overflow-hidden border border-white/5 transition-all ${
+                          isCompleted ? 'opacity-90 shadow-[inset_0_1px_3px_rgba(255,255,255,0.2)]' : isPlanned ? 'opacity-40 animate-pulse' : 'opacity-25'
+                        }`}
+                        title={`${w.type} (${w.status})`}
+                      >
+                        <span className="text-[8px] sm:text-[9.5px] font-black uppercase tracking-widest text-white/90 [writing-mode:vertical-lr] rotate-180 select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] whitespace-nowrap">
+                          {w.type}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
               {/* Day number */}
-              <div className="flex justify-between items-start">
-                <span className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-lg transition-all ${
+              <div className="flex justify-between items-start z-10">
+                <span className={`text-xs font-black w-6 h-6 flex items-center justify-center rounded-lg transition-all ${
                   isTodayDate
                     ? 'bg-gradient-to-br from-orange-500 to-pink-600 text-white shadow-[0_2px_8px_rgba(249,115,22,0.4)]'
-                    : 'text-slate-400 group-hover:text-white'
+                    : dayWorkouts.length > 0
+                      ? 'bg-slate-950/80 text-white border border-white/10 backdrop-blur-sm shadow'
+                      : 'text-slate-400 group-hover:text-white'
                 }`}>
                   {format(day, dateFormat)}
                 </span>
               </div>
 
-              {/* Workouts rendered as micro smartwatch-face vector app icons */}
-              <div className="mt-2 flex flex-wrap gap-1.5 overflow-hidden">
-                {dayWorkouts.map((w) => (
-                  <div
-                    key={w.id}
-                    title={`${w.type} (${w.status})`}
-                    className="relative"
-                  >
-                    <WorkoutArtwork type={w.type} status={w.status} size="xs" />
-                    {w.type === 'Running' && w.running_distance_km ? (
-                      <span className="absolute -bottom-1 -right-1 text-[8px] font-black px-0.5 bg-slate-950 text-orange-400 border border-white/5 rounded">
-                        {Math.round(w.running_distance_km)}
-                      </span>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
+              {/* Running Distance or other stat overlay at bottom right */}
+              {dayWorkouts.some(w => w.type === 'Running' && w.running_distance_km) && (
+                <span className="absolute bottom-2 right-2 text-[9px] font-black px-1.5 py-0.5 bg-slate-950/85 text-orange-400 border border-white/10 rounded-md shadow backdrop-blur-sm z-10">
+                  🏃 {dayWorkouts.filter(w => w.type === 'Running').reduce((acc, curr) => acc + (curr.running_distance_km || 0), 0).toFixed(1)}k
+                </span>
+              )}
             </Link>
           )
         })}
@@ -117,3 +136,16 @@ export default function CalendarGrid({ workouts }: Props) {
     </div>
   )
 }
+
+const gradientMap: Record<string, string> = {
+  Running: 'from-orange-500 via-pink-500 to-indigo-500',
+  Pull: 'from-teal-400 via-teal-600 to-teal-900',
+  Push: 'from-yellow-400 via-orange-500 to-red-600',
+  Leg: 'from-amber-500 via-orange-600 to-orange-950',
+  Full: 'from-emerald-400 via-emerald-600 to-blue-600',
+  Rest: 'from-indigo-900 via-purple-950 to-slate-950',
+  Tennis: 'from-orange-500 via-amber-500 to-amber-700',
+  Other: 'from-slate-600 via-slate-700 to-slate-900',
+}
+
+
