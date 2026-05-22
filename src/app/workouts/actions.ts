@@ -1,0 +1,64 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+import { createWorkout, updateWorkout, deleteWorkout } from '@/lib/workouts/repository'
+import { CreateWorkoutPayload, UpdateWorkoutPayload, WorkoutType, WorkoutStatus, RunningIntensity } from '@/lib/types'
+
+function formDataToPayload(formData: FormData): CreateWorkoutPayload {
+  const type = formData.get('type') as WorkoutType
+  const status = formData.get('status') as WorkoutStatus
+
+  const distanceRaw = formData.get('running_distance_km')
+  const durationRaw = formData.get('running_duration_sec')
+  const paceRaw = formData.get('running_pace_sec_per_km')
+
+  return {
+    workout_date: formData.get('workout_date') as string,
+    type,
+    status,
+    title: formData.get('title') as string || null,
+    markdown: formData.get('markdown') as string || '',
+    notes: formData.get('notes') as string || null,
+    running_distance_km: distanceRaw ? Number(distanceRaw) : null,
+    running_duration_sec: durationRaw ? Number(durationRaw) : null,
+    running_pace_sec_per_km: paceRaw ? Number(paceRaw) : null,
+    running_intensity: (formData.get('running_intensity') as RunningIntensity) || null,
+  }
+}
+
+export async function addWorkoutAction(formData: FormData) {
+  const payload = formDataToPayload(formData)
+  
+  await createWorkout(payload)
+  
+  revalidatePath('/workouts')
+  revalidatePath('/calendar')
+  revalidatePath('/')
+  
+  redirect(`/workouts/${payload.workout_date}`)
+}
+
+export async function editWorkoutAction(id: string, formData: FormData) {
+  const payload = formDataToPayload(formData) as UpdateWorkoutPayload
+  
+  await updateWorkout(id, payload)
+  
+  revalidatePath('/workouts')
+  revalidatePath('/calendar')
+  revalidatePath('/')
+  revalidatePath(`/workouts/${payload.workout_date}`)
+  
+  redirect(`/workouts/${payload.workout_date}`)
+}
+
+export async function deleteWorkoutAction(id: string, date: string) {
+  await deleteWorkout(id)
+  
+  revalidatePath('/workouts')
+  revalidatePath('/calendar')
+  revalidatePath('/')
+  revalidatePath(`/workouts/${date}`)
+  
+  redirect('/workouts')
+}
