@@ -11,13 +11,13 @@ interface Props {
 }
 
 const workoutThemes: Record<string, { bg: string; border: string; text: string }> = {
-  Running: { bg: 'bg-orange-50', border: 'border-orange-100', text: 'text-orange-700' },
+  Running: { bg: 'bg-red-50', border: 'border-red-100', text: 'text-red-700' },
   Pull: { bg: 'bg-teal-50', border: 'border-teal-100', text: 'text-teal-700' },
   Push: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700' },
-  Leg: { bg: 'bg-yellow-50', border: 'border-yellow-100', text: 'text-yellow-800' },
-  Full: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700' },
+  Leg: { bg: 'bg-purple-50', border: 'border-purple-100', text: 'text-purple-700' },
+  Full: { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-700' },
   Rest: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-700' },
-  Tennis: { bg: 'bg-lime-50', border: 'border-lime-100', text: 'text-lime-700' },
+  Tennis: { bg: 'bg-green-50', border: 'border-green-100', text: 'text-green-700' },
   Other: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-700' },
 }
 
@@ -100,9 +100,11 @@ export default function CalendarGrid({ workouts }: Props) {
               {dayWorkouts.length > 0 && (
                 <div className="absolute inset-1.5 flex flex-col gap-1 -z-10 overflow-hidden">
                   {dayWorkouts.map((w) => {
-                    const theme = workoutThemes[w.type] || workoutThemes['Other']
+                    const normType = w.type.charAt(0).toUpperCase() + w.type.slice(1).toLowerCase()
+                    const theme = workoutThemes[normType] || workoutThemes['Other']
                     const isCompleted = w.status === 'completed'
                     const isPlanned = w.status === 'planned'
+                    const displayLabel = w.type.toUpperCase() === 'RUNNING' ? 'RUN' : w.type
                     return (
                       <div
                         key={w.id}
@@ -112,7 +114,7 @@ export default function CalendarGrid({ workouts }: Props) {
                         title={`${w.type} (${w.status})`}
                       >
                         <span className="text-[8px] sm:text-[9.5px] font-extrabold uppercase tracking-wider select-none truncate whitespace-nowrap">
-                          {w.type}
+                          {displayLabel}
                         </span>
                       </div>
                     )
