@@ -5,10 +5,20 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { WorkoutEntry } from '@/lib/types'
-import WorkoutArtwork from './WorkoutArtwork'
 
 interface Props {
   workouts: WorkoutEntry[]
+}
+
+const workoutThemes: Record<string, { bg: string; border: string; text: string }> = {
+  Running: { bg: 'bg-orange-50', border: 'border-orange-100', text: 'text-orange-700' },
+  Pull: { bg: 'bg-teal-50', border: 'border-teal-100', text: 'text-teal-700' },
+  Push: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700' },
+  Leg: { bg: 'bg-yellow-50', border: 'border-yellow-100', text: 'text-yellow-800' },
+  Full: { bg: 'bg-emerald-50', border: 'border-emerald-100', text: 'text-emerald-700' },
+  Rest: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-700' },
+  Tennis: { bg: 'bg-lime-50', border: 'border-lime-100', text: 'text-lime-700' },
+  Other: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-700' },
 }
 
 export default function CalendarGrid({ workouts }: Props) {
@@ -30,43 +40,43 @@ export default function CalendarGrid({ workouts }: Props) {
   return (
     <div className="retro-card overflow-hidden">
       {/* Calendar Header */}
-      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/5 bg-slate-900/40">
-        <h2 className="text-2xl font-black tracking-wide text-white capitalize">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-100 bg-slate-50/50">
+        <h2 className="text-xl font-extrabold tracking-tight text-slate-900 capitalize">
           {format(currentDate, 'MMMM yyyy')}
         </h2>
         <div className="flex items-center gap-2">
           <button
             onClick={prevMonth}
-            className="p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800/90 border border-white/5 transition-colors text-slate-400 hover:text-white"
+            className="p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-colors text-slate-500 hover:text-slate-900"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentDate(new Date())}
-            className="px-4 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-white transition-all shadow-[0_2px_10px_rgba(249,115,22,0.3)] active:scale-95"
+            className="px-4 py-1.5 text-xs font-bold rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-all shadow-sm active:scale-95"
           >
             Today
           </button>
           <button
             onClick={nextMonth}
-            className="p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800/90 border border-white/5 transition-colors text-slate-400 hover:text-white"
+            className="p-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 transition-colors text-slate-500 hover:text-slate-900"
           >
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       </div>
 
       {/* Weekday headers */}
-      <div className="grid grid-cols-7 border-b border-white/5 bg-slate-950/20">
+      <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/20">
         {weekDays.map((day) => (
-          <div key={day} className="py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-wider">
+          <div key={day} className="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-wider">
             {day}
           </div>
         ))}
       </div>
 
       {/* Days grid */}
-      <div className="grid grid-cols-7 auto-rows-fr bg-slate-950/10">
+      <div className="grid grid-cols-7 auto-rows-fr bg-slate-50/30">
         {days.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd')
           const dayWorkouts = workouts.filter(w => w.workout_date === dateStr)
@@ -78,30 +88,30 @@ export default function CalendarGrid({ workouts }: Props) {
             <Link
               key={day.toString()}
               href={`/workouts/${dateStr}`}
-              className={`min-h-[90px] sm:min-h-[110px] p-3 rounded-2xl transition-all duration-300 relative group flex flex-col justify-between m-1 overflow-hidden border isolate ${
+              className={`min-h-[90px] sm:min-h-[110px] p-3 rounded-2xl transition-all duration-200 relative group flex flex-col justify-between m-1 overflow-hidden border isolate ${
                 dayWorkouts.length > 0 
-                  ? 'border-white/10 shadow-lg hover:scale-102 hover:shadow-[0_8px_20px_-5px_rgba(0,0,0,0.8)]' 
-                  : 'border-white/5 hover:border-white/10 bg-slate-900/30'
+                  ? 'border-slate-200 bg-slate-50/30 hover:bg-slate-50/70 hover:shadow-sm' 
+                  : 'border-slate-100 hover:border-slate-200 bg-white hover:shadow-sm'
               } ${
                 !isCurrentMonth ? 'opacity-20 pointer-events-none' : ''
-              } ${isTodayDate ? 'ring-2 ring-orange-500/50' : ''}`}
+              } ${isTodayDate ? 'ring-2 ring-slate-900/30' : ''}`}
             >
               {/* Split Workout Gradients Background */}
               {dayWorkouts.length > 0 && (
-                <div className="absolute inset-1.5 flex gap-1 -z-10 overflow-hidden">
+                <div className="absolute inset-1.5 flex flex-col gap-1 -z-10 overflow-hidden">
                   {dayWorkouts.map((w) => {
-                    const grad = gradientMap[w.type] || gradientMap['Other']
+                    const theme = workoutThemes[w.type] || workoutThemes['Other']
                     const isCompleted = w.status === 'completed'
                     const isPlanned = w.status === 'planned'
                     return (
                       <div
                         key={w.id}
-                        className={`flex-1 h-full bg-gradient-to-br ${grad} rounded-xl relative flex items-center justify-center overflow-hidden border border-white/5 transition-all ${
-                          isCompleted ? 'opacity-90 shadow-[inset_0_1px_3px_rgba(255,255,255,0.2)]' : isPlanned ? 'opacity-40 animate-pulse' : 'opacity-25'
+                        className={`flex-1 flex items-center justify-center rounded-lg border ${theme.bg} ${theme.border} ${theme.text} px-2 transition-all ${
+                          isCompleted ? 'opacity-100 shadow-sm' : isPlanned ? 'opacity-60 animate-pulse' : 'opacity-40'
                         }`}
                         title={`${w.type} (${w.status})`}
                       >
-                        <span className="text-[8px] sm:text-[9.5px] font-black uppercase tracking-widest text-white/90 [writing-mode:vertical-lr] rotate-180 select-none drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] whitespace-nowrap">
+                        <span className="text-[8px] sm:text-[9.5px] font-extrabold uppercase tracking-wider select-none truncate whitespace-nowrap">
                           {w.type}
                         </span>
                       </div>
@@ -112,12 +122,12 @@ export default function CalendarGrid({ workouts }: Props) {
 
               {/* Day number */}
               <div className="flex justify-between items-start z-10">
-                <span className={`text-xs font-black w-6 h-6 flex items-center justify-center rounded-lg transition-all ${
+                <span className={`text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-md transition-all ${
                   isTodayDate
-                    ? 'bg-gradient-to-br from-orange-500 to-pink-600 text-white shadow-[0_2px_8px_rgba(249,115,22,0.4)]'
+                    ? 'bg-slate-900 text-white shadow-sm'
                     : dayWorkouts.length > 0
-                      ? 'bg-slate-950/80 text-white border border-white/10 backdrop-blur-sm shadow'
-                      : 'text-slate-400 group-hover:text-white'
+                      ? 'bg-slate-900 text-white shadow-sm border border-slate-800'
+                      : 'text-slate-400 group-hover:text-slate-900 font-bold'
                 }`}>
                   {format(day, dateFormat)}
                 </span>
@@ -125,7 +135,7 @@ export default function CalendarGrid({ workouts }: Props) {
 
               {/* Running Distance or other stat overlay at bottom right */}
               {dayWorkouts.some(w => w.type === 'Running' && w.running_distance_km) && (
-                <span className="absolute bottom-2 right-2 text-[9px] font-black px-1.5 py-0.5 bg-slate-950/85 text-orange-400 border border-white/10 rounded-md shadow backdrop-blur-sm z-10">
+                <span className="absolute bottom-2 right-2 text-[9px] font-black px-1.5 py-0.5 bg-slate-900 text-white border border-slate-800 rounded-md shadow-sm z-10">
                   🏃 {dayWorkouts.filter(w => w.type === 'Running').reduce((acc, curr) => acc + (curr.running_distance_km || 0), 0).toFixed(1)}k
                 </span>
               )}
@@ -136,16 +146,3 @@ export default function CalendarGrid({ workouts }: Props) {
     </div>
   )
 }
-
-const gradientMap: Record<string, string> = {
-  Running: 'from-orange-500 via-pink-500 to-indigo-500',
-  Pull: 'from-teal-400 via-teal-600 to-teal-900',
-  Push: 'from-yellow-400 via-orange-500 to-red-600',
-  Leg: 'from-amber-500 via-orange-600 to-orange-950',
-  Full: 'from-emerald-400 via-emerald-600 to-blue-600',
-  Rest: 'from-indigo-900 via-purple-950 to-slate-950',
-  Tennis: 'from-orange-500 via-amber-500 to-amber-700',
-  Other: 'from-slate-600 via-slate-700 to-slate-900',
-}
-
-

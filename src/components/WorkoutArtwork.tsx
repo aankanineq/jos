@@ -275,7 +275,7 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
     <div className={clsx('relative inline-block shrink-0 select-none transition-transform hover:scale-105 duration-300', sizeMap[size], className)}>
       <svg
         viewBox="0 0 100 100"
-        className="w-full h-full drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)]"
+        className="w-full h-full drop-shadow-[0_2px_5px_rgba(15,23,42,0.08)]"
       >
         {/* Core Landscape Illustration */}
         {renderLandscape()}

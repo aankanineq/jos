@@ -49,27 +49,27 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const intensities: RunningIntensity[] = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-6 sm:p-8">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-6 sm:p-8 bg-white border border-slate-100">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-300 tracking-wide">날짜</label>
+          <label className="text-sm font-bold text-slate-700 tracking-wide">날짜</label>
           <input
             type="date"
             name="workout_date"
             defaultValue={defaultDate}
             required
-            className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all font-medium"
+            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-medium shadow-sm"
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-bold text-slate-300 tracking-wide">상태</label>
+          <label className="text-sm font-bold text-slate-700 tracking-wide">상태</label>
           <select
             name="status"
             defaultValue={initialData?.status || 'completed'}
-            className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all font-medium"
+            className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-medium shadow-sm"
           >
             {statuses.map((s) => (
-              <option key={s} value={s} className="bg-slate-900 text-white">
+              <option key={s} value={s} className="bg-white text-slate-900">
                 {s.toUpperCase()}
               </option>
             ))}
@@ -78,7 +78,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-bold text-slate-300 tracking-wide">운동 종류</label>
+        <label className="text-sm font-bold text-slate-700 tracking-wide">운동 종류</label>
         <div className="flex flex-wrap gap-2">
           {types.map((t) => (
             <button
@@ -87,8 +87,8 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
               onClick={() => setType(t)}
               className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${
                 type === t
-                  ? 'bg-gradient-to-r from-orange-500 to-pink-600 text-white border-transparent shadow-[0_2px_10px_rgba(249,115,22,0.4)] scale-102'
-                  : 'bg-slate-950/40 text-slate-400 border-white/5 hover:border-white/10 hover:text-white'
+                  ? 'bg-slate-900 text-white border-slate-950 shadow-sm scale-102'
+                  : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-slate-200 hover:text-slate-800'
               }`}
             >
               {t}
@@ -100,39 +100,39 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
       </div>
 
       {type === 'Running' && (
-        <div className="p-5 rounded-2xl border border-white/5 bg-slate-950/30 space-y-4 shadow-inner">
-          <h3 className="font-bold text-orange-400 text-sm tracking-wide">🏃 러닝 추가 정보</h3>
+        <div className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 space-y-4">
+          <h3 className="font-bold text-slate-800 text-sm tracking-wide">🏃 러닝 추가 정보</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400">거리 (km)</label>
+              <label className="text-xs font-semibold text-slate-500">거리 (km)</label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 name="running_distance_km"
                 defaultValue={initialData?.running_distance_km || ''}
-                className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400">시간 (초)</label>
+              <label className="text-xs font-semibold text-slate-500">시간 (초)</label>
               <input
                 type="number"
                 min="0"
                 name="running_duration_sec"
                 defaultValue={initialData?.running_duration_sec || ''}
-                className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-slate-400">강도</label>
+              <label className="text-xs font-semibold text-slate-500">강도</label>
               <select
                 name="running_intensity"
                 defaultValue={initialData?.running_intensity || 'easy'}
-                className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all shadow-sm"
               >
                 {intensities.map((i) => (
-                  <option key={i} value={i} className="bg-slate-900 text-white">{i}</option>
+                  <option key={i} value={i} className="bg-white text-slate-900">{i}</option>
                 ))}
               </select>
             </div>
@@ -141,7 +141,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-bold text-slate-300 tracking-wide">
+        <label className="text-sm font-bold text-slate-700 tracking-wide">
           운동 기록 (Markdown)
         </label>
         <textarea
@@ -150,28 +150,28 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
           required={type !== 'Rest'}
           defaultValue={initialData?.markdown || ''}
           placeholder={`## 풀업\nBW 10 10 10\n\n## 시티드로우\n50kg 12 10 10`}
-          className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 font-mono text-sm leading-relaxed transition-all"
+          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 font-mono text-sm leading-relaxed transition-all shadow-sm"
         />
       </div>
 
       {errorMsg && (
-        <p className="p-3.5 bg-red-950/30 border border-red-500/20 text-red-300 text-xs font-semibold text-center rounded-xl animate-shake">
+        <p className="p-3.5 bg-red-50 border border-red-100 text-red-700 text-xs font-semibold text-center rounded-xl animate-shake">
           {errorMsg}
         </p>
       )}
 
-      <div className="pt-4 flex justify-end gap-4 border-t border-white/5">
+      <div className="pt-4 flex justify-end gap-4 border-t border-slate-100">
         <button
           type="button"
           onClick={() => window.history.back()}
-          className="px-5 py-2.5 rounded-xl text-slate-400 hover:text-white font-semibold transition-colors"
+          className="px-5 py-2.5 rounded-xl text-slate-500 hover:text-slate-900 font-semibold transition-colors"
         >
           취소
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-white font-bold transition-all disabled:opacity-50 shadow-[0_4px_15px_-5px_rgba(249,115,22,0.4)] active:scale-97"
+          className="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition-all disabled:opacity-50 shadow-sm active:scale-97"
         >
           {isSubmitting ? '저장 중...' : isEditing ? '수정 완료' : '기록 추가'}
         </button>

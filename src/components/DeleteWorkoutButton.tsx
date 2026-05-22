@@ -32,7 +32,7 @@ export default function DeleteWorkoutButton({ id, date }: Props) {
       type="button"
       disabled={isDeleting}
       onClick={handleDelete}
-      className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg transition-colors disabled:opacity-50"
+      className="p-2 bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 rounded-xl transition-all shadow-sm disabled:opacity-50"
       title="삭제"
     >
       <Trash2 className="w-4 h-4" />

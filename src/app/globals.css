@@ -12,23 +12,15 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(226, 232, 240, 0.8);
   }
 }
 
 :root {
-  --background: #0a0e1a; /* Elegant deep dark navy-charcoal */
-  --foreground: #f8fafc;
-  --muted: #131c31;
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --muted: #f8fafc;
   --muted-foreground: #64748b;
-  
-  /* Retro travel poster gradient primary colors */
-  --color-accent-running: #f97316;
-  --color-accent-pull: #0d9488;
-  --color-accent-push: #f97316;
-  --color-accent-leg: #d97706;
-  --color-accent-full: #059669;
-  --color-accent-rest: #4c1d95;
 }
 
 body {
@@ -37,46 +29,18 @@ body {
   font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: 
-    radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(249, 115, 22, 0.04) 0%, transparent 45%);
-  background-attachment: fixed;
 }
 
-/* Beautiful custom glassy cards and retro travel poster elements */
+/* Beautiful custom minimalist white cards and clean elements */
 @layer utilities {
   .retro-card {
-    @apply bg-slate-900/60 backdrop-blur-md border border-white/5 rounded-3xl transition-all duration-300 hover:border-white/10 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.7)];
+    @apply bg-white border border-slate-100 rounded-3xl transition-all duration-300 hover:border-slate-200/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)];
   }
 
-  .retro-card-glow-running {
-    @apply shadow-[0_0_25px_-10px_rgba(249,115,22,0.25)];
-  }
-
-  .retro-card-glow-pull {
-    @apply shadow-[0_0_25px_-10px_rgba(13,148,136,0.25)];
-  }
-
-  .retro-card-glow-push {
-    @apply shadow-[0_0_25px_-10px_rgba(250,204,21,0.25)];
-  }
-
-  .retro-card-glow-leg {
-    @apply shadow-[0_0_25px_-10px_rgba(217,119,6,0.25)];
-  }
-
-  .retro-card-glow-full {
-    @apply shadow-[0_0_25px_-10px_rgba(5,150,105,0.25)];
-  }
-
-  .retro-card-glow-rest {
-    @apply shadow-[0_0_25px_-10px_rgba(76,29,149,0.25)];
-  }
-
-  /* Glassmorphism scrollbar */
+  /* Clean minimal scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   
   ::-webkit-scrollbar-track {
@@ -84,11 +48,11 @@ body {
   }
   
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(15, 23, 42, 0.08);
     border-radius: 9999px;
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(15, 23, 42, 0.15);
   }
 }

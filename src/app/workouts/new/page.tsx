@@ -15,13 +15,13 @@ export default async function NewWorkoutPage(props: Props) {
       <header className="flex items-center gap-4">
         <Link 
           href={date ? `/workouts/${date}` : "/"} 
-          className="p-3 -ml-3 rounded-2xl bg-slate-900/40 hover:bg-slate-800/80 border border-white/5 transition-colors text-slate-400 hover:text-white"
+          className="p-3 -ml-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 transition-colors text-slate-500 hover:text-slate-900 shadow-sm"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">새 운동 기록</h1>
-          <p className="text-slate-400 text-xs font-semibold tracking-wider mt-0.5 uppercase">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">새 운동 기록</h1>
+          <p className="text-slate-500 text-xs font-bold tracking-wider mt-0.5 uppercase">
             {date ? `${date} 기록 작성` : '오늘의 운동 기록 추가'}
           </p>
         </div>
@@ -31,4 +31,3 @@ export default async function NewWorkoutPage(props: Props) {
     </div>
   )
 }
-
