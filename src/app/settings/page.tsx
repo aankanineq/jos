@@ -14,47 +14,50 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in pb-24 max-w-2xl mx-auto">
+    <div className="space-y-8 animate-in fade-in pb-24 max-w-2xl mx-auto">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
-        <p className="text-zinc-400 mt-1">데이터 관리 및 계정 설정</p>
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-400 via-pink-500 to-indigo-400 bg-clip-text text-transparent">
+          Settings
+        </h1>
+        <p className="text-slate-400 mt-1.5 font-medium tracking-wide">데이터 관리 및 계정 관련 설정입니다.</p>
       </header>
 
-      <section className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6">
-        <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
-          <SettingsIcon className="w-5 h-5 text-zinc-400" />
-          <h2 className="text-xl font-semibold">데이터 내보내기 (Export)</h2>
+      {/* Data Export section */}
+      <section className="retro-card p-6 sm:p-8 space-y-6">
+        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+          <SettingsIcon className="w-5 h-5 text-orange-400" />
+          <h2 className="text-xl font-black text-white tracking-wide">데이터 내보내기 (Export)</h2>
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm text-zinc-400">
-            특정 월의 데이터를 JSON 또는 Markdown 형식으로 다운로드합니다.
+          <p className="text-sm text-slate-400 font-medium">
+            기록해두신 운동 로그 데이터를 백업할 수 있습니다. 특정 월의 데이터를 가공하여 JSON 또는 Markdown 파일로 다운로드합니다.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center pt-2">
             <div className="space-y-1.5 w-full sm:w-auto">
-              <label className="text-xs font-medium text-zinc-500">월 선택</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">월 선택</label>
               <input
                 type="month"
                 value={exportMonth}
                 onChange={(e) => setExportMonth(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-950/60 border border-white/5 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all font-semibold"
               />
             </div>
             
-            <div className="flex gap-2 w-full sm:w-auto sm:mt-5">
+            <div className="flex gap-3 w-full sm:w-auto sm:mt-5 shrink-0">
               <button
                 onClick={() => handleExport('json')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors border border-zinc-700"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-900/60 hover:bg-slate-800/80 text-slate-200 px-5 py-2.5 rounded-xl font-bold transition-all border border-white/5 active:scale-97"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-orange-400" />
                 JSON
               </button>
               <button
                 onClick={() => handleExport('markdown')}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors border border-zinc-700"
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-900/60 hover:bg-slate-800/80 text-slate-200 px-5 py-2.5 rounded-xl font-bold transition-all border border-white/5 active:scale-97"
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-4 h-4 text-pink-500" />
                 Markdown
               </button>
             </div>
@@ -62,17 +65,22 @@ export default function SettingsPage() {
         </div>
       </section>
 
-      <section className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-xl space-y-6 mt-8">
-        <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
+      {/* Session Management section */}
+      <section className="retro-card p-6 sm:p-8 space-y-6">
+        <div className="flex items-center gap-3 border-b border-white/5 pb-4">
           <LogOut className="w-5 h-5 text-red-400" />
-          <h2 className="text-xl font-semibold text-red-400">세션 관리</h2>
+          <h2 className="text-xl font-black text-red-400 tracking-wide">세션 관리</h2>
         </div>
 
-        <div>
+        <div className="space-y-4">
+          <p className="text-sm text-slate-400 font-medium">
+            현재 로그인되어 있는 Supabase 인증 세션을 종료하고 안전하게 로그아웃합니다.
+          </p>
+          
           <form action={logout}>
             <button
               type="submit"
-              className="bg-red-900/20 hover:bg-red-900/40 text-red-400 border border-red-900/50 px-6 py-2.5 rounded-lg font-medium transition-colors"
+              className="bg-red-950/30 hover:bg-red-950/60 text-red-400 border border-red-500/20 hover:border-red-500/40 px-6 py-3 rounded-xl font-bold transition-all active:scale-97"
             >
               로그아웃
             </button>

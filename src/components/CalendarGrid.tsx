@@ -5,7 +5,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { WorkoutEntry } from '@/lib/types'
-import WorkoutBadge from './WorkoutBadge'
+import WorkoutArtwork from './WorkoutArtwork'
 
 interface Props {
   workouts: WorkoutEntry[]
@@ -28,32 +28,46 @@ export default function CalendarGrid({ workouts }: Props) {
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-xl overflow-hidden">
-      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-zinc-800 bg-zinc-900/50">
-        <h2 className="text-xl font-bold">{format(currentDate, 'MMMM yyyy')}</h2>
-        <div className="flex space-x-2">
-          <button onClick={prevMonth} className="p-2 rounded-full hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+    <div className="retro-card overflow-hidden">
+      {/* Calendar Header */}
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-white/5 bg-slate-900/40">
+        <h2 className="text-2xl font-black tracking-wide text-white capitalize">
+          {format(currentDate, 'MMMM yyyy')}
+        </h2>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={prevMonth}
+            className="p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800/90 border border-white/5 transition-colors text-slate-400 hover:text-white"
+          >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <button onClick={() => setCurrentDate(new Date())} className="px-3 py-1 text-sm font-medium rounded-full bg-zinc-800 hover:bg-zinc-700 text-white transition-colors">
+          <button
+            onClick={() => setCurrentDate(new Date())}
+            className="px-4 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-white transition-all shadow-[0_2px_10px_rgba(249,115,22,0.3)] active:scale-95"
+          >
             Today
           </button>
-          <button onClick={nextMonth} className="p-2 rounded-full hover:bg-zinc-800 transition-colors text-zinc-400 hover:text-white">
+          <button
+            onClick={nextMonth}
+            className="p-2 rounded-xl bg-slate-800/40 hover:bg-slate-800/90 border border-white/5 transition-colors text-slate-400 hover:text-white"
+          >
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 border-b border-zinc-800">
+      {/* Weekday headers */}
+      <div className="grid grid-cols-7 border-b border-white/5 bg-slate-950/20">
         {weekDays.map((day) => (
-          <div key={day} className="py-2 text-center text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+          <div key={day} className="py-3 text-center text-[10px] font-black text-slate-500 uppercase tracking-wider">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 auto-rows-fr">
-        {days.map((day, i) => {
+      {/* Days grid */}
+      <div className="grid grid-cols-7 auto-rows-fr bg-slate-950/10">
+        {days.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd')
           const dayWorkouts = workouts.filter(w => w.workout_date === dateStr)
           
@@ -64,30 +78,35 @@ export default function CalendarGrid({ workouts }: Props) {
             <Link
               key={day.toString()}
               href={`/workouts/${dateStr}`}
-              className={`min-h-[100px] sm:min-h-[120px] p-1 sm:p-2 border-b border-r border-zinc-800/50 hover:bg-zinc-800/30 transition-colors relative group ${
-                !isCurrentMonth ? 'bg-zinc-950/50 opacity-50' : ''
-              } ${isTodayDate ? 'bg-blue-900/10' : ''}`}
+              className={`min-h-[90px] sm:min-h-[110px] p-2 border-b border-r border-white/5 hover:bg-white/[0.02] transition-all relative group flex flex-col justify-between ${
+                !isCurrentMonth ? 'bg-slate-950/40 opacity-30 pointer-events-none' : ''
+              } ${isTodayDate ? 'bg-orange-500/5' : ''}`}
             >
+              {/* Day number */}
               <div className="flex justify-between items-start">
-                <span className={`text-sm sm:text-base font-medium p-1 w-7 h-7 flex items-center justify-center rounded-full ${
-                  isTodayDate ? 'bg-blue-600 text-white' : 'text-zinc-400 group-hover:text-white'
+                <span className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-lg transition-all ${
+                  isTodayDate
+                    ? 'bg-gradient-to-br from-orange-500 to-pink-600 text-white shadow-[0_2px_8px_rgba(249,115,22,0.4)]'
+                    : 'text-slate-400 group-hover:text-white'
                 }`}>
                   {format(day, dateFormat)}
                 </span>
               </div>
 
-              <div className="mt-1 flex flex-col gap-1 overflow-y-auto max-h-[80px] no-scrollbar">
-                {dayWorkouts.map(w => (
-                  <div key={w.id} className="flex flex-col gap-0.5">
-                    <WorkoutBadge type={w.type} className="text-[10px] sm:text-xs py-0 sm:py-0.5 inline-block w-fit opacity-90" />
-                    {w.type === 'Running' && w.running_distance_km && (
-                      <span className="text-[10px] text-zinc-500 font-medium pl-1">
-                        {w.running_distance_km}km
+              {/* Workouts rendered as micro smartwatch-face vector app icons */}
+              <div className="mt-2 flex flex-wrap gap-1.5 overflow-hidden">
+                {dayWorkouts.map((w) => (
+                  <div
+                    key={w.id}
+                    title={`${w.type} (${w.status})`}
+                    className="relative"
+                  >
+                    <WorkoutArtwork type={w.type} status={w.status} size="xs" />
+                    {w.type === 'Running' && w.running_distance_km ? (
+                      <span className="absolute -bottom-1 -right-1 text-[8px] font-black px-0.5 bg-slate-950 text-orange-400 border border-white/5 rounded">
+                        {Math.round(w.running_distance_km)}
                       </span>
-                    )}
-                    {w.status === 'planned' && (
-                      <span className="text-[9px] text-blue-400/80 uppercase pl-1 block">예정</span>
-                    )}
+                    ) : null}
                   </div>
                 ))}
               </div>

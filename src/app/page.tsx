@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { getMonthlyStats, getRecentWorkouts, getTodayWorkouts } from '@/lib/workouts/stats'
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon, Activity, PlusCircle, ChevronRight, CheckCircle2, Clock } from 'lucide-react'
-import WorkoutBadge from '@/components/WorkoutBadge'
+import { Calendar as CalendarIcon, Activity, PlusCircle, ChevronRight, CheckCircle2, Dumbbell } from 'lucide-react'
+import WorkoutArtwork from '@/components/WorkoutArtwork'
 
 export default async function Dashboard() {
   const today = new Date()
@@ -23,103 +23,148 @@ export default async function Dashboard() {
       {/* Header section */}
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-zinc-400 mt-1">{todayStr}</p>
+          <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-orange-400 via-pink-500 to-indigo-400 bg-clip-text text-transparent">
+            Dashboard
+          </h1>
+          <p className="text-slate-400 mt-1.5 font-medium tracking-wide">{todayStr}</p>
         </div>
         <Link
           href="/workouts/new"
-          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-blue-900/20"
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-pink-600 hover:from-orange-400 hover:to-pink-500 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 shadow-[0_4px_20px_-5px_rgba(249,115,22,0.4)] hover:scale-102 hover:shadow-[0_6px_25px_-5px_rgba(249,115,22,0.5)] active:scale-98"
         >
           <PlusCircle className="w-5 h-5" />
           오늘 운동 기록하기
         </Link>
       </header>
 
-      {/* Today Status Alert */}
-      <section>
-        <div className="p-4 rounded-2xl bg-zinc-900/50 border border-zinc-800 flex items-start gap-4">
-          <div className="p-2 rounded-full bg-zinc-800">
-            <Activity className="w-6 h-6 text-blue-400" />
+      {/* Today Status Alert Card */}
+      <section className="retro-card p-6 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div className="p-4 rounded-2xl bg-slate-800/80 border border-white/5 shadow-inner">
+            <Activity className="w-8 h-8 text-orange-400 animate-pulse" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg text-white">오늘의 상태</h3>
+          <div className="flex-1 space-y-1">
+            <h3 className="font-bold text-xl text-white tracking-wide">오늘의 상태</h3>
             {hasLoggedToday ? (
-              <p className="text-zinc-400 mt-1 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-green-400" /> 운동 완료! 멋집니다.
+              <p className="text-emerald-400 mt-1 flex items-center gap-2 font-medium">
+                <CheckCircle2 className="w-5 h-5" /> 오늘 운동 완료! 아주 훌륭한 하루입니다.
               </p>
             ) : (
-              <p className="text-zinc-400 mt-1">아직 오늘 운동을 기록하지 않았습니다.</p>
-            )}
-            
-            {plannedToday.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-sm font-medium text-zinc-300">오늘 예정된 운동:</p>
-                <div className="flex flex-wrap gap-2">
-                  {plannedToday.map(w => (
-                    <WorkoutBadge key={w.id} type={w.type} />
-                  ))}
-                </div>
-              </div>
+              <p className="text-slate-300 mt-1">아직 오늘 운동을 기록하지 않았습니다. 기록을 남겨보세요!</p>
             )}
           </div>
         </div>
+
+        {todayWorkouts.length > 0 && (
+          <div className="mt-6 pt-6 border-t border-white/5">
+            <p className="text-sm font-bold text-slate-400 tracking-wider uppercase mb-4">오늘의 운동 리스트</p>
+            <div className="flex flex-wrap gap-6">
+              {todayWorkouts.map((w) => (
+                <Link
+                  key={w.id}
+                  href={`/workouts/${w.workout_date}`}
+                  className="flex flex-col items-center gap-2 group"
+                >
+                  <WorkoutArtwork type={w.type} status={w.status} size="md" />
+                  <span className="text-xs font-semibold text-slate-300 group-hover:text-white transition-colors mt-1">
+                    {w.type}
+                  </span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                    w.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' :
+                    w.status === 'planned' ? 'bg-blue-500/10 text-blue-400' : 'bg-slate-800 text-slate-500'
+                  }`}>
+                    {w.status}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Monthly Stats */}
-        <section className="p-6 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 shadow-xl">
+        <section className="retro-card p-6 lg:col-span-5 relative overflow-hidden flex flex-col justify-between">
+          <div className="absolute -bottom-10 -left-10 w-44 h-44 bg-teal-500/5 rounded-full blur-3xl -z-10" />
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">{currentMonthStr} 요약</h2>
-            <Link href="/stats" className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center">
+            <h2 className="text-2xl font-black tracking-wide text-white">{currentMonthStr} 요약</h2>
+            <Link href="/stats" className="text-orange-400 hover:text-orange-300 text-sm font-semibold flex items-center transition-colors">
               자세히 <ChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
-              <p className="text-zinc-400 text-sm font-medium mb-1">운동일수</p>
-              <p className="text-3xl font-bold text-white">{stats.workoutDays}<span className="text-base font-normal text-zinc-500 ml-1">일</span></p>
+          
+          <div className="grid grid-cols-2 gap-4 my-auto py-4">
+            <div className="p-5 rounded-2xl bg-slate-900/80 border border-white/5 shadow-inner transition-transform hover:scale-102 duration-300">
+              <p className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">운동일수</p>
+              <p className="text-4xl font-extrabold text-white flex items-baseline">
+                {stats.workoutDays}
+                <span className="text-sm font-medium text-slate-500 ml-1">일</span>
+              </p>
             </div>
-            <div className="p-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
-              <p className="text-zinc-400 text-sm font-medium mb-1">러닝 거리</p>
-              <p className="text-3xl font-bold text-white">{stats.totalRunningDistance.toFixed(1)}<span className="text-base font-normal text-zinc-500 ml-1">km</span></p>
+            <div className="p-5 rounded-2xl bg-slate-900/80 border border-white/5 shadow-inner transition-transform hover:scale-102 duration-300">
+              <p className="text-slate-400 text-xs font-bold tracking-wider uppercase mb-1">러닝 거리</p>
+              <p className="text-4xl font-extrabold text-white flex items-baseline">
+                {stats.totalRunningDistance.toFixed(1)}
+                <span className="text-sm font-medium text-slate-500 ml-1">km</span>
+              </p>
             </div>
+          </div>
+
+          <div className="mt-4 text-xs text-slate-500 text-center">
+            꾸준히 기록하는 것 자체가 훌륭한 습관입니다.
           </div>
         </section>
 
         {/* Recent Workouts */}
-        <section className="p-6 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 shadow-xl flex flex-col">
+        <section className="retro-card p-6 lg:col-span-7 relative overflow-hidden flex flex-col">
+          <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl -z-10" />
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold">최근 운동</h2>
-            <Link href="/workouts" className="text-blue-400 hover:text-blue-300 text-sm font-medium flex items-center">
+            <h2 className="text-2xl font-black tracking-wide text-white">최근 운동</h2>
+            <Link href="/workouts" className="text-orange-400 hover:text-orange-300 text-sm font-semibold flex items-center transition-colors">
               모두 보기 <ChevronRight className="w-4 h-4 ml-0.5" />
             </Link>
           </div>
           
-          <div className="flex-1 flex flex-col gap-3">
+          <div className="flex-1 flex flex-col gap-4">
             {recentWorkouts.length === 0 ? (
-              <div className="flex-1 flex items-center justify-center text-zinc-500 text-sm">
-                기록이 없습니다.
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-500 text-sm py-12">
+                <Dumbbell className="w-8 h-8 mb-2 opacity-20" />
+                기록이 없습니다. 첫 운동을 기록해보세요!
               </div>
             ) : (
               recentWorkouts.map((w) => (
                 <Link
                   key={w.id}
                   href={`/workouts/${w.workout_date}`}
-                  className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30 hover:bg-zinc-800/80 border border-zinc-800 transition-colors group"
+                  className="flex items-center justify-between p-4 rounded-2xl bg-slate-900/40 hover:bg-slate-800/60 border border-white/5 hover:border-white/10 transition-all duration-300 group"
                 >
-                  <div className="flex items-center gap-3">
-                    <WorkoutBadge type={w.type} />
-                    <span className="text-sm font-medium text-zinc-300 group-hover:text-white transition-colors">
-                      {format(new Date(w.workout_date), 'M/d')}
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <WorkoutArtwork type={w.type} status={w.status} size="sm" />
+                    <div>
+                      <h4 className="font-bold text-white tracking-wide group-hover:text-orange-400 transition-colors">
+                        {w.type}
+                      </h4>
+                      <p className="text-xs text-slate-400 font-semibold tracking-wider mt-0.5">
+                        {format(new Date(w.workout_date), 'yyyy. MM. dd')}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {w.status === 'planned' && <Clock className="w-4 h-4 text-zinc-500" />}
-                    {w.status === 'skipped' && <span className="text-xs text-zinc-500">Skipped</span>}
+                  <div className="flex items-center gap-4">
                     {w.type === 'Running' && w.running_distance_km ? (
-                      <span className="text-sm text-zinc-400 font-medium">{w.running_distance_km}km</span>
-                    ) : null}
-                    <ChevronRight className="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      <span className="text-sm font-extrabold text-slate-300 bg-slate-800/80 px-3 py-1 rounded-xl border border-white/5">
+                        {w.running_distance_km}km
+                      </span>
+                    ) : (
+                      <span className={`text-xs px-2.5 py-1 rounded-lg font-bold uppercase tracking-wider ${
+                        w.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                        w.status === 'planned' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                        'bg-slate-800 text-slate-500 border border-slate-700/50'
+                      }`}>
+                        {w.status}
+                      </span>
+                    )}
+                    <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-slate-400 transition-colors" />
                   </div>
                 </Link>
               ))
@@ -131,9 +176,9 @@ export default async function Dashboard() {
       <div className="pt-4 flex justify-center">
         <Link
           href="/calendar"
-          className="inline-flex items-center gap-2 text-zinc-400 hover:text-white transition-colors font-medium px-4 py-2"
+          className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors font-semibold px-6 py-3 rounded-2xl bg-slate-900/40 border border-white/5 hover:border-white/10"
         >
-          <CalendarIcon className="w-5 h-5" />
+          <CalendarIcon className="w-5 h-5 text-orange-400" />
           캘린더 보기
         </Link>
       </div>
