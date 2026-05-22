@@ -526,11 +526,31 @@ status: completed
 
 턱걸이 10회 5세트 진행 완료.`}
                 </div>
-                <div className="space-y-1 text-slate-400">
-                  <p>✔ **헤더 형식**: `## YYYY-MM-DD 운동명` 형식으로 시작해야 합니다.</p>
-                  <p>✔ **지원 운동명**: `Pull(풀)`, `Push(푸쉬)`, `Leg(레그)`, `Running(러닝)`, `Tennis(테니스)`, `Full(전신)`, `Rest(휴식)`, `Other(기타)`</p>
-                  <p>✔ **속성값들**: 헤더 바로 아랫줄에 `key: value` 형태로 기입합니다.</p>
-                  <p>✔ **구분선**: 개별 운동 구분선(`---`)은 필수는 아니나, 여러 개를 연속해서 기입할 때는 가독성을 위해 사용하는 것이 좋습니다.</p>
+                <div className="space-y-3.5 pt-2 border-t border-slate-100 text-slate-500 text-xs">
+                  <p className="font-bold text-slate-800 flex items-center gap-1">📌 마크다운 파싱 및 동기화 핵심 규칙</p>
+                  <ul className="list-disc pl-4 space-y-2 text-slate-500 font-semibold leading-relaxed">
+                    <li>
+                      <strong>헤더 형식</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## YYYY-MM-DD 운동종류</code> 형식을 엄수해야 합니다. 날짜 주변에 대괄호나 이모지가 붙어도 무방합니다. (예: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## 🗓️ [2026-05-21] 러닝</code>)
+                    </li>
+                    <li>
+                      <strong>지원 운동종류</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Running(러닝)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Pull(풀)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Push(푸쉬)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Leg(레그)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Full(전신)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Tennis(테니스)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Rest(휴식)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Other(기타)</code>를 완벽하게 인식하고 매핑합니다.
+                    </li>
+                    <li>
+                      <strong>상태값(status) 제약</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">completed</code>(완료됨)와 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">planned</code>(예정됨) <strong>두 가지만 기입이 허용</strong>됩니다. (사용자 편의상 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">complete</code>로 적어도 completed로 자동 치환 처리됩니다. 레거시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">skipped</code>는 오류로 분류하여 경고합니다.)
+                    </li>
+                    <li>
+                      <strong>러닝 시간(duration) 기입 규칙</strong>: 반드시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">H:MM:SS</code> 형식(시간:분:초)을 엄수해야 합니다. <strong>어떠한 요소도 임의 생략할 수 없으며</strong>, 예를 들어 36분인 경우에도 시(Hour) 영역을 0으로 채워 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">duration: 0:36:00</code> 형태로 작성해야 올바르게 해석됩니다.
+                    </li>
+                    <li>
+                      <strong>페이스(Pace) 자동 연산</strong>: 속성에 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">running_pace_sec_per_km</code> 필드를 입력받지 않으며, 마크다운에 적힌 페이스는 완전히 무시됩니다. 거리(<code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">running_distance_km</code>)와 시간(<code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">duration</code>)을 입력하면 <strong>백엔드가 페이스를 자동 산출하여 데이터베이스에 저장</strong>합니다.
+                    </li>
+                    <li>
+                      <strong>거리 및 시간 유효성</strong>: 러닝 유형의 경우, 거리와 시간 중 하나만 누락되어도 파싱 경고와 함께 업로드가 차단되므로 반드시 두 값을 함께 기입해야 합니다.
+                    </li>
+                    <li>
+                      <strong>중복 방지 (덮어쓰기)</strong>: 날짜와 운동종류가 중복되는 기존 기록이 존재하면, 기존의 상세 마크다운 일지 및 수치 데이터를 새 마크다운 내용으로 안전하게 <strong>덮어쓰기(Upsert)</strong>하여 중복 생성을 원천 방지합니다.
+                    </li>
+                  </ul>
                 </div>
               </div>
             )}
