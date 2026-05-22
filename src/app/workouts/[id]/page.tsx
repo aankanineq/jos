@@ -4,7 +4,7 @@ import Link from 'next/link'
 import WorkoutBadge from '@/components/WorkoutBadge'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
-import { deleteWorkoutAction } from '@/app/workouts/actions'
+import DeleteWorkoutButton from '@/components/DeleteWorkoutButton'
 
 export default async function DailyWorkoutPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -50,20 +50,7 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
                   >
                     <Edit2 className="w-4 h-4" />
                   </Link>
-                  <form action={async () => {
-                    'use server';
-                    await deleteWorkoutAction(workout.id, dateStrParam);
-                  }}>
-                    <button
-                      type="submit"
-                      className="p-2 bg-red-900/20 hover:bg-red-900/40 text-red-400 rounded-lg transition-colors"
-                      onClick={(e) => {
-                        if (!confirm('정말 삭제하시겠습니까?')) e.preventDefault()
-                      }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </form>
+                  <DeleteWorkoutButton id={workout.id} date={dateStrParam} />
                 </div>
               </div>
 
