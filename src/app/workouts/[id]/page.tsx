@@ -6,11 +6,12 @@ import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 import { deleteWorkoutAction } from '@/app/workouts/actions'
 
-export default async function DailyWorkoutPage(props: { params: Promise<{ date: string }> }) {
+export default async function DailyWorkoutPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
-  const workouts = await getWorkoutByDate(params.date)
+  const dateStrParam = params.id
+  const workouts = await getWorkoutByDate(dateStrParam)
 
-  const dateStr = format(new Date(params.date), 'yyyy년 M월 d일')
+  const dateStr = format(new Date(dateStrParam), 'yyyy년 M월 d일')
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto animate-in fade-in pb-24">
@@ -25,7 +26,7 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ date: 
         <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-12 text-center">
           <p className="text-zinc-500 mb-4">이 날짜에 기록된 운동이 없습니다.</p>
           <Link
-            href={`/workouts/new?date=${params.date}`}
+            href={`/workouts/new?date=${dateStrParam}`}
             className="inline-flex bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-full font-medium transition-colors"
           >
             기록 추가하기
@@ -51,7 +52,7 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ date: 
                   </Link>
                   <form action={async () => {
                     'use server';
-                    await deleteWorkoutAction(workout.id, params.date);
+                    await deleteWorkoutAction(workout.id, dateStrParam);
                   }}>
                     <button
                       type="submit"
