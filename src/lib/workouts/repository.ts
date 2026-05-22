@@ -48,9 +48,19 @@ export async function getWorkoutById(id: string): Promise<WorkoutEntry | null> {
 
 export async function createWorkout(payload: CreateWorkoutPayload): Promise<WorkoutEntry> {
   const supabase = await createClient()
+  
+  // Get the current authenticated user to explicitly set user_id
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    throw new Error('User not authenticated')
+  }
+
   const { data, error } = await supabase
     .from('workouts')
-    .insert([payload])
+    .insert([{
+      ...payload,
+      user_id: user.id
+    }])
     .select()
     .single()
 
