@@ -11,14 +11,14 @@ interface Props {
 }
 
 const workoutThemes: Record<string, { bg: string; border: string; text: string }> = {
-  Running: { bg: 'bg-red-50', border: 'border-red-100', text: 'text-red-700' },
-  Pull: { bg: 'bg-teal-50', border: 'border-teal-100', text: 'text-teal-700' },
-  Push: { bg: 'bg-amber-50', border: 'border-amber-100', text: 'text-amber-700' },
-  Leg: { bg: 'bg-purple-50', border: 'border-purple-100', text: 'text-purple-700' },
-  Full: { bg: 'bg-blue-50', border: 'border-blue-100', text: 'text-blue-700' },
-  Rest: { bg: 'bg-indigo-50', border: 'border-indigo-100', text: 'text-indigo-700' },
-  Tennis: { bg: 'bg-green-50', border: 'border-green-100', text: 'text-green-700' },
-  Other: { bg: 'bg-slate-50', border: 'border-slate-100', text: 'text-slate-700' },
+  Running: { bg: 'bg-red-100', border: 'border-red-200', text: 'text-red-900' },
+  Pull: { bg: 'bg-teal-100', border: 'border-teal-200', text: 'text-teal-900' },
+  Push: { bg: 'bg-amber-100', border: 'border-amber-200', text: 'text-amber-900' },
+  Leg: { bg: 'bg-purple-100', border: 'border-purple-200', text: 'text-purple-900' },
+  Full: { bg: 'bg-blue-100', border: 'border-blue-200', text: 'text-blue-900' },
+  Rest: { bg: 'bg-indigo-100', border: 'border-indigo-200', text: 'text-indigo-900' },
+  Tennis: { bg: 'bg-green-100', border: 'border-green-200', text: 'text-green-900' },
+  Other: { bg: 'bg-slate-100', border: 'border-slate-200', text: 'text-slate-900' },
 }
 
 export default function CalendarGrid({ workouts }: Props) {
@@ -113,7 +113,7 @@ export default function CalendarGrid({ workouts }: Props) {
                         }`}
                         title={`${w.type} (${w.status})`}
                       >
-                        <span className="text-[8px] sm:text-[9.5px] font-extrabold uppercase tracking-wider select-none truncate whitespace-nowrap">
+                        <span className="text-[9.5px] sm:text-[11px] font-black uppercase tracking-wider select-none truncate whitespace-nowrap">
                           {displayLabel}
                         </span>
                       </div>

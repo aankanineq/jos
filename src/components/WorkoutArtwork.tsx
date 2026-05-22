@@ -10,16 +10,16 @@ interface Props {
   className?: string
 }
 
-// Map workout types to highly distinct pastel themes (with clear contrast)
+// Map workout types to highly distinct pastel themes (with richer contrast and deeper colors)
 const artworkThemes: Record<string, { bg: string; text: string; label: string }> = {
-  Running: { bg: '#fef2f2', text: '#dc2626', label: 'RUN' },
-  Pull: { bg: '#f0fdfa', text: '#0d9488', label: 'PULL' },
-  Push: { bg: '#fefbeb', text: '#d97706', label: 'PUSH' },
-  Leg: { bg: '#faf5ff', text: '#7e22ce', label: 'LEG' },
-  Full: { bg: '#eff6ff', text: '#1d4ed8', label: 'FULL' },
-  Rest: { bg: '#f5f3ff', text: '#4338ca', label: 'REST' },
-  Tennis: { bg: '#f0fdf4', text: '#16a34a', label: 'TENNIS' },
-  Other: { bg: '#f8fafc', text: '#475569', label: 'OTHER' },
+  Running: { bg: '#fee2e2', text: '#991b1b', label: 'RUN' },
+  Pull: { bg: '#ccfbf1', text: '#115e59', label: 'PULL' },
+  Push: { bg: '#fef08a', text: '#854d0e', label: 'PUSH' },
+  Leg: { bg: '#f3e8ff', text: '#6b21a8', label: 'LEG' },
+  Full: { bg: '#dbeafe', text: '#1e40af', label: 'FULL' },
+  Rest: { bg: '#e0e7ff', text: '#3730a3', label: 'REST' },
+  Tennis: { bg: '#dcfce7', text: '#166534', label: 'TENNIS' },
+  Other: { bg: '#f1f5f9', text: '#334155', label: 'OTHER' },
 }
 
 export default function WorkoutArtwork({ type, status = 'completed', size = 'md', className }: Props) {
@@ -36,8 +36,8 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
 
   // Get theme based on normalized type
   const theme = artworkThemes[normType] || {
-    bg: '#f8fafc',
-    text: '#475569',
+    bg: '#f1f5f9',
+    text: '#334155',
     label: type.trim().toUpperCase() === 'RUNNING' ? 'RUN' : type.trim().toUpperCase()
   }
 
@@ -83,17 +83,17 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
     }
   }
 
-  // Dynamic font sizing based on label length to prevent overflow inside circle
+  // Dynamic font sizing based on label length to prevent overflow inside circle (made larger and bolder)
   const label = theme.label
-  let fontSize = '24px'
+  let fontSize = '28px'
   if (label.length <= 3) {
-    fontSize = '28px'
+    fontSize = '35px'
   } else if (label.length === 4) {
-    fontSize = '24px'
+    fontSize = '30px'
   } else if (label.length === 5) {
-    fontSize = '20px'
+    fontSize = '25px'
   } else {
-    fontSize = '16px'
+    fontSize = '20px'
   }
 
   return (
