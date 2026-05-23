@@ -32,7 +32,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
 
   // --- Import States ---
-  const [importTab, setImportTab] = useState<'file' | 'paste'>('file')
+  const [importTab, setImportTab] = useState<'file' | 'paste'>('paste')
   const [pasteText, setPasteText] = useState('')
   const [dragActive, setDragActive] = useState(false)
   const [importing, setImporting] = useState(false)
@@ -733,7 +733,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             <button
               type="button"
               onClick={() => setShowHelp(!showHelp)}
-              className="w-full px-4 py-3 flex.items-center justify-between flex items-center font-bold text-xs text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
+              className="w-full px-4 py-3 justify-between flex items-center font-bold text-xs text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-1.5">
                 💡 마크다운 가져오기(Import) 약속 양식 보기
@@ -742,7 +742,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             </button>
 
             {showHelp && (
-              <div className="px-4 pb-4.pt-1 border-t border-slate-100 space-y-3.5 text-xs text-slate-500 font-semibold leading-relaxed p-4 bg-white animate-in slide-in-from-top-2 duration-200">
+              <div className="px-4 pb-4 pt-1 border-t border-slate-100 space-y-3.5 text-xs text-slate-500 font-semibold leading-relaxed p-4 bg-white animate-in slide-in-from-top-2 duration-200">
                 <p>
                   가져올 마크다운 백업은 반드시 아래 규격을 엄격히 지켜야 파싱 엔진이 해석할 수 있습니다:
                 </p>
@@ -751,6 +751,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 status: completed
 running_distance_km: 6.0
 duration: 0:36:00
+running_intensity: easy
 
 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.
 
@@ -762,21 +763,21 @@ status: completed
 턱걸이 10회 5세트 진행 완료.`}
                 </div>
                 <div className="space-y-3.5 pt-2 border-t border-slate-100 text-slate-500 text-xs">
-                  <p className="font-bold text-slate-800 flex items-center gap-1">📌 마크다운 파싱 및 동기화 최종 검증 규칙</p>
+                  <p className="font-bold text-slate-800 flex items-center gap-1">📌 마크다운 파싱 및 동기화 최종 검증 규칙 (JOS v1 Spec)</p>
                   <ul className="list-disc pl-4 space-y-2 text-slate-500 font-semibold leading-relaxed">
                     <li>
-                      <strong>헤더 형식</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## YYYY-MM-DD 운동종류</code> 형식을 엄수해야 합니다. 날짜 주변에 대괄호나 이모지가 붙어도 무방합니다. (예: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## 🗓️ [2026-05-21] 러닝</code>)
+                      <strong>헤더 형식 (영어 전용)</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## YYYY-MM-DD WorkoutType</code> 형식을 엄수해야 합니다. 한글 이름, 이모지, 대괄호 등은 허용되지 않습니다. (예: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">## 2026-05-21 Running</code>)
                     </li>
                     <li>
-                      <strong>지원 운동종류</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Running(러닝)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Pull(풀)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Push(푸쉬)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Leg(레그)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Full(전신)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Tennis(테니스)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Rest(휴식)</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Other(기타)</code>를 인식하고 매핑합니다.
+                      <strong>지원 운동종류</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Running</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Pull</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Push</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Leg</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Full</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Tennis</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Rest</code>, <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">Other</code> 영어 표기만 대소문자 매칭으로 허용됩니다.
                     </li>
                     <li>
-                      <strong>상태값(status) 제약</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">completed</code>(완료됨)와 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">planned</code>(예정됨) <strong>두 가지만 기입이 허용</strong>됩니다. (사용자 편의상 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">complete</code>로 적어도 completed로 자동 치환 처리됩니다. 레거시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">skipped</code>는 반려 처리됩니다.)
+                      <strong>상태값(status) 제약</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">completed</code>(완료됨)와 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">planned</code>(예정됨) **두 가지만 기입이 허용**되며, 어떠한 자동 치환이나 보정도 지원하지 않습니다. (예: `complete`나 `skipped`는 모두 에러 처리).
                     </li>
                     <li>
                       <strong>운동 종류별 필수/선택 제약</strong>:
                       <ul className="list-disc pl-4 mt-1 space-y-1 text-[11px] text-slate-500 font-medium">
-                        <li><strong>Running + completed</strong>: 거리(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">running_distance_km</code>) <strong>필수</strong>, 시간(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">duration</code>) <strong>필수</strong>, 메모(본문) 선택</li>
+                        <li><strong>Running + completed</strong>: 거리(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">running_distance_km</code>) <strong>필수</strong>, 시간(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">duration</code>) <strong>필수</strong></li>
                         <li><strong>Running + planned</strong>: 거리 선택, 시간 선택, 메모 선택</li>
                         <li><strong>근력 운동군(Pull/Push/Leg/Full) + completed</strong>: 메모(본문) <strong>필수</strong> (세부 수행 기록 필수)</li>
                         <li><strong>근력 운동군(Pull/Push/Leg/Full) + planned</strong>: 메모 선택</li>
@@ -784,16 +785,16 @@ status: completed
                       </ul>
                     </li>
                     <li>
-                      <strong>러닝 외 운동 수치 기입 제한</strong>: 러닝이 아닌 모든 운동(근력 운동군, 테니스, 휴식 등)에는 러닝 거리, 시간, 강도 등의 수치 속성 기입이 <strong>엄격하게 금지</strong>되며, 기입 적발 시 오류로 거절됩니다.
+                      <strong>러닝 외 운동 수치 기입 제한</strong>: 러닝이 아닌 모든 운동(근력 운동군, 테니스, 휴식 등)에는 러닝 거리, 시간, 강도, 페이스 등의 수치 속성 기입이 <strong>엄격하게 금지</strong>되며, 기입 시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">invalid</code> 오류로 처리됩니다.
                     </li>
                     <li>
-                      <strong>러닝 시간(duration) 기입 규칙</strong>: 반드시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">H:MM:SS</code> 형식(시간:분:초)을 지켜야 합니다. 36분인 경우에도 시(Hour) 영역을 0으로 채워 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">duration: 0:36:00</code> 형태로 작성해야 올바르게 파싱됩니다.
+                      <strong>러닝 시간(duration) 기입 규칙</strong>: 반드시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">H:MM:SS</code> 형식(예: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">duration: 0:36:00</code>)을 엄수해야 합니다.
                     </li>
                     <li>
-                      <strong>페이스(Pace) 자동 연산</strong>: 속성에 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">running_pace_sec_per_km</code> 필드는 직접 입력하지 않으며, 거리와 시간이 모두 있을 때 <strong>시스템 내부에서 페이스를 자동 산출</strong>해 동기화합니다.
+                      <strong>페이스(running_pace_sec_per_km) 수동 입력 금지</strong>: 수동 기입 시 에러로 처리되며, 거리와 시간이 모두 존재할 때 시스템이 내부적으로 자동 산출하여 DB에 등록합니다.
                     </li>
                     <li>
-                      <strong>중복 방지 (덮어쓰기)</strong>: 날짜와 운동종류가 중복되는 기존 기록이 존재하면, 기존의 상세 마크다운 일지 및 수치 데이터를 새 마크다운 내용으로 안전하게 <strong>덮어쓰기(Upsert)</strong>하여 중복 생성을 원천 방지합니다.
+                      <strong>가져오기 = 항상 추가 (Overwrite 없음)</strong>: 중복 조회를 하거나 기존 기록을 덮어쓰지 않고, 가져오기를 실행한 모든 운동 기록 블록은 <strong>새로운 행으로 안전하게 데이터베이스에 삽입(Insert)</strong>됩니다.
                     </li>
                   </ul>
                 </div>
