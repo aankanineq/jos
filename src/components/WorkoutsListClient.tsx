@@ -28,11 +28,26 @@ const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: stri
   { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-teal-200 bg-teal-50/40 text-teal-700 hover:bg-teal-50/80', activeColor: 'bg-teal-600 text-white border-teal-600' },
 ]
 
+const TYPE_LABELS: Record<string, string> = {
+  all: '👥 전체 운동',
+  Pull: '💪 풀 (Pull)',
+  Push: '🔥 푸쉬 (Push)',
+  Leg: '🦵 레그 (Leg)',
+  Running: '🏃 러닝 (Running)',
+  Tennis: '🎾 테니스 (Tennis)',
+  Full: '🏋️ 전신 (Full)',
+  Rest: '🛌 휴식 (Rest)',
+  Other: '📝 기타 (Other)',
+  'Shoulder, Arm': '🎯 어깨팔 (Shoulder, Arm)'
+}
+
+
 export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClientProps) {
   const router = useRouter()
   const [selectedMonth, setSelectedMonth] = useState<string>('all')
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [selectedType, setSelectedType] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [isTypeFilterOpen, setIsTypeFilterOpen] = useState(false)
 
   // Multi-delete states
   const [isDeleteMode, setIsDeleteMode] = useState(false)
@@ -65,9 +80,9 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
         if (month !== selectedMonth) return false
       }
 
-      // Filter by Workout Type (Multi-Select)
-      if (selectedTypes.length > 0) {
-        if (!selectedTypes.includes(w.type)) return false
+      // Filter by Workout Type
+      if (selectedType !== 'all') {
+        if (w.type !== selectedType) return false
       }
 
       // Filter by Search Query (searches in type, notes, and markdown)
@@ -82,7 +97,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
 
       return true
     })
-  }, [initialWorkouts, selectedMonth, selectedTypes, searchQuery])
+  }, [initialWorkouts, selectedMonth, selectedType, searchQuery])
 
   // 3. Compute dynamic statistics based on currently filtered workouts
   const stats = useMemo(() => {
@@ -139,7 +154,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
 
   const handleClearFilters = () => {
     setSelectedMonth('all')
-    setSelectedTypes([])
+    setSelectedType('all')
     setSearchQuery('')
   }
 
@@ -277,58 +292,68 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
           </div>
         </div>
 
-        {/* Row 2: Workout Type Selection (Horizontal Pills with Multi-Select) */}
+        {/* Row 2: Workout Type Selection (Collapsible Horizontal Pills) */}
         <div className="space-y-3">
-          <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-            <Activity className="w-4 h-4 text-slate-500" />
-            운동 종류 선택 (Workout Type - 중복 선택 가능)
-          </label>
-          <div className="flex flex-wrap gap-2.5 pr-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-slate-500" />
+              운동 종류별 보기 (Workout Type)
+            </label>
+            
+            {/* Expand / Collapse Toggle Button */}
             <button
               type="button"
-              onClick={() => setSelectedTypes([])}
-              className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
-                selectedTypes.length === 0
-                  ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                  : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350 hover:text-slate-800'
-              }`}
+              onClick={() => setIsTypeFilterOpen(!isTypeFilterOpen)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
             >
-              전체 운동
+              <span>현재 선택: <strong>{TYPE_LABELS[selectedType] || selectedType}</strong></span>
+              {isTypeFilterOpen ? (
+                <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+              )}
             </button>
-            {WORKOUT_TYPES.map((t) => {
-              const isSelected = selectedTypes.includes(t.id)
-              const hasActiveFilters = selectedTypes.length > 0
-              
-              let buttonStyle = ""
-              if (!hasActiveFilters) {
-                // No specific filters: show all in their gorgeous outline-colored styles
-                buttonStyle = `${t.color} border`
-              } else if (isSelected) {
-                // This type is active: show in solid active style
-                buttonStyle = `${t.activeColor} border font-black scale-102 shadow-md shadow-slate-100`
-              } else {
-                // Other types are active: show this type as faded/muted
-                buttonStyle = `${t.color} border opacity-35 scale-98 hover:opacity-80`
-              }
-
-              return (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => {
-                    if (isSelected) {
-                      setSelectedTypes(selectedTypes.filter(id => id !== t.id))
-                    } else {
-                      setSelectedTypes([...selectedTypes, t.id])
-                    }
-                  }}
-                  className={`px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 ${buttonStyle}`}
-                >
-                  {t.label}
-                </button>
-              )
-            })}
           </div>
+          
+          {/* Pills Panel with Smooth Collapse/Expand */}
+          {isTypeFilterOpen && (
+            <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedType('all')
+                  setIsTypeFilterOpen(false) // Close panel after selection to save space
+                }}
+                className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
+                  selectedType === 'all'
+                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350 hover:text-slate-800'
+                }`}
+              >
+                전체 운동
+              </button>
+              {WORKOUT_TYPES.map((t) => {
+                const isSelected = selectedType === t.id
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedType(t.id)
+                      setIsTypeFilterOpen(false) // Close panel after selection to save space
+                    }}
+                    className={`px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 ${
+                      isSelected
+                        ? `${t.activeColor} border font-black scale-102 shadow-md shadow-slate-100`
+                        : `${t.color} border`
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Row 3: Live Search */}
@@ -353,7 +378,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
           </div>
 
           {/* Active Filter Indicators / Clear Filters */}
-          {(selectedMonth !== 'all' || selectedTypes.length > 0 || searchQuery !== '') && (
+          {(selectedMonth !== 'all' || selectedType !== 'all' || searchQuery !== '') && (
             <button
               onClick={handleClearFilters}
               className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1.5 py-2 px-3 border border-slate-100 hover:border-slate-200 rounded-xl bg-slate-50/50 cursor-pointer active:scale-97"
@@ -383,7 +408,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
         </div>
 
         {/* Running Cumulative Stats Cards (Only if Running is filtered or exists in set) */}
-        {selectedTypes.includes('Running') || (selectedTypes.length === 0 && stats.runningCount > 0) ? (
+        {selectedType === 'Running' || (selectedType === 'all' && stats.runningCount > 0) ? (
           <>
             {/* Card 2: Running Cumulative Distance */}
             <div className="retro-card p-5 bg-white border border-slate-100 flex flex-col justify-between">
