@@ -17,28 +17,28 @@ interface WorkoutsListClientProps {
 }
 
 const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: string; activeColor: string }[] = [
-  { id: 'Pull', label: '💪 풀 (Pull)', icon: '💪', color: 'border-indigo-200 bg-indigo-50/40 text-indigo-700 hover:bg-indigo-50/80', activeColor: 'bg-indigo-600 text-white border-indigo-600' },
-  { id: 'Push', label: '🔥 푸쉬 (Push)', icon: '🔥', color: 'border-orange-200 bg-orange-50/40 text-orange-700 hover:bg-orange-50/80', activeColor: 'bg-orange-600 text-white border-orange-600' },
-  { id: 'Leg', label: '🦵 레그 (Leg)', icon: '🦵', color: 'border-amber-200 bg-amber-50/40 text-amber-700 hover:bg-amber-50/80', activeColor: 'bg-amber-600 text-white border-amber-600' },
-  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-teal-200 bg-teal-50/40 text-teal-700 hover:bg-teal-50/80', activeColor: 'bg-teal-600 text-white border-teal-600' },
-  { id: 'Full', label: '🏋️ 전신 (Full)', icon: '🏋️', color: 'border-purple-200 bg-purple-50/40 text-purple-700 hover:bg-purple-50/80', activeColor: 'bg-purple-600 text-white border-purple-600' },
-  { id: 'Running', label: '🏃 러닝 (Running)', icon: '🏃', color: 'border-blue-200 bg-blue-50/40 text-blue-700 hover:bg-blue-50/80', activeColor: 'bg-blue-600 text-white border-blue-600' },
-  { id: 'Tennis', label: '🎾 테니스 (Tennis)', icon: '🎾', color: 'border-emerald-200 bg-emerald-50/40 text-emerald-700 hover:bg-emerald-50/80', activeColor: 'bg-emerald-600 text-white border-emerald-600' },
-  { id: 'Rest', label: '🛌 휴식 (Rest)', icon: '🛌', color: 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100', activeColor: 'bg-slate-700 text-white border-slate-700' },
-  { id: 'Other', label: '📝 기타 (Other)', icon: '📝', color: 'border-rose-200 bg-rose-50/40 text-rose-700 hover:bg-rose-50/80', activeColor: 'bg-rose-600 text-white border-rose-600' },
+  { id: 'Pull', label: '풀 (Pull)', icon: '💪', color: 'border-indigo-200 bg-indigo-50/40 text-indigo-700 hover:bg-indigo-50/80', activeColor: 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-100/50' },
+  { id: 'Push', label: '푸쉬 (Push)', icon: '🔥', color: 'border-red-200 bg-red-50/40 text-red-700 hover:bg-red-50/80', activeColor: 'bg-red-600 text-white border-red-600 shadow-red-100/50' },
+  { id: 'Leg', label: '레그 (Leg)', icon: '🦵', color: 'border-amber-200 bg-amber-50/40 text-amber-700 hover:bg-amber-50/80', activeColor: 'bg-amber-500 text-white border-amber-500 shadow-amber-100/50' },
+  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-cyan-200 bg-cyan-50/40 text-cyan-700 hover:bg-cyan-50/80', activeColor: 'bg-cyan-600 text-white border-cyan-600 shadow-cyan-100/50' },
+  { id: 'Full', label: '전신 (Full)', icon: '🏋️', color: 'border-fuchsia-200 bg-fuchsia-50/40 text-fuchsia-700 hover:bg-fuchsia-50/80', activeColor: 'bg-fuchsia-600 text-white border-fuchsia-600 shadow-fuchsia-100/50' },
+  { id: 'Running', label: '러닝 (Running)', icon: '🏃', color: 'border-blue-200 bg-blue-50/40 text-blue-700 hover:bg-blue-50/80', activeColor: 'bg-blue-600 text-white border-blue-600 shadow-blue-100/50' },
+  { id: 'Tennis', label: '테니스 (Tennis)', icon: '🎾', color: 'border-lime-200 bg-lime-50/40 text-lime-700 hover:bg-lime-50/80', activeColor: 'bg-lime-600 text-white border-lime-600 shadow-lime-100/50' },
+  { id: 'Rest', label: '휴식 (Rest)', icon: '🛌', color: 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100', activeColor: 'bg-slate-700 text-white border-slate-700 shadow-slate-100/50' },
+  { id: 'Other', label: '기타 (Other)', icon: '📝', color: 'border-pink-200 bg-pink-50/40 text-pink-700 hover:bg-pink-50/80', activeColor: 'bg-pink-600 text-white border-pink-600 shadow-pink-100/50' },
 ]
 
 const TYPE_LABELS: Record<string, string> = {
-  all: '👥 전체 운동',
-  Pull: '💪 풀 (Pull)',
-  Push: '🔥 푸쉬 (Push)',
-  Leg: '🦵 레그 (Leg)',
-  Running: '🏃 러닝 (Running)',
-  Tennis: '🎾 테니스 (Tennis)',
-  Full: '🏋️ 전신 (Full)',
-  Rest: '🛌 휴식 (Rest)',
-  Other: '📝 기타 (Other)',
-  'Shoulder, Arm': '🎯 어깨팔 (Shoulder, Arm)'
+  all: '전체 운동',
+  Pull: '풀 (Pull)',
+  Push: '푸쉬 (Push)',
+  Leg: '레그 (Leg)',
+  Running: '러닝 (Running)',
+  Tennis: '테니스 (Tennis)',
+  Full: '전신 (Full)',
+  Rest: '휴식 (Rest)',
+  Other: '기타 (Other)',
+  'Shoulder, Arm': '어깨팔 (Shoulder, Arm)'
 }
 
 
@@ -555,10 +555,10 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                         <h4 className="font-extrabold text-slate-900 text-lg tracking-wide group-hover:text-slate-800 transition-colors">
                           {w.type}
                         </h4>
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-extrabold uppercase tracking-wider ${
-                          w.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                          w.status === 'planned' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
-                          'bg-slate-100 text-slate-500 border border-slate-200'
+                        <span className={`text-[10px] px-2 py-0.5 rounded-lg font-black uppercase tracking-wider ${
+                          w.status === 'completed' 
+                            ? 'bg-emerald-600 text-white border border-emerald-600 shadow-sm shadow-emerald-100/50' 
+                            : 'bg-slate-50 text-slate-400 border border-dashed border-slate-350 font-extrabold'
                         }`}>
                           {w.status}
                         </span>

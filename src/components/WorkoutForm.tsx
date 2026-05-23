@@ -80,15 +80,15 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const statuses: WorkoutStatus[] = ['planned', 'completed']
 
   const typeLabels: Record<WorkoutType, string> = {
-    Pull: '💪 풀 (Pull)',
-    Push: '🔥 푸쉬 (Push)',
-    Leg: '🦵 레그 (Leg)',
-    Running: '🏃 러닝 (Running)',
-    Full: '🏋️ 전신 (Full)',
-    Tennis: '🎾 테니스 (Tennis)',
-    Rest: '🛌 휴식 (Rest)',
-    Other: '📝 기타 (Other)',
-    'Shoulder, Arm': '🎯 어깨팔 (Shoulder, Arm)'
+    Pull: '풀 (Pull)',
+    Push: '푸쉬 (Push)',
+    Leg: '레그 (Leg)',
+    Running: '러닝 (Running)',
+    Full: '전신 (Full)',
+    Tennis: '테니스 (Tennis)',
+    Rest: '휴식 (Rest)',
+    Other: '기타 (Other)',
+    'Shoulder, Arm': '어깨팔 (Shoulder, Arm)'
   }
 
   return (

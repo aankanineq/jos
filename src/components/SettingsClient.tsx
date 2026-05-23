@@ -164,15 +164,15 @@ interface SettingsClientProps {
 }
 
 const WORKOUT_TYPES = [
-  { id: 'Pull', label: '💪 풀 (Pull)', color: 'border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100/50' },
-  { id: 'Push', label: '🔥 푸쉬 (Push)', color: 'border-orange-200 bg-orange-50/80 text-orange-700 hover:bg-orange-100/50' },
-  { id: 'Leg', label: '🦵 레그 (Leg)', color: 'border-amber-200 bg-amber-50/80 text-amber-700 hover:bg-amber-100/50' },
-  { id: 'Running', label: '🏃 러닝 (Running)', color: 'border-blue-200 bg-blue-50/80 text-blue-700 hover:bg-blue-100/50' },
-  { id: 'Tennis', label: '🎾 테니스 (Tennis)', color: 'border-emerald-200 bg-emerald-50/80 text-emerald-700 hover:bg-emerald-100/50' },
-  { id: 'Full', label: '🏋️ 전신 (Full)', color: 'border-purple-200 bg-purple-50/80 text-purple-700 hover:bg-purple-100/50' },
-  { id: 'Rest', label: '🛌 휴식 (Rest)', color: 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200/50' },
-  { id: 'Other', label: '📝 기타 (Other)', color: 'border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-100/50' },
-  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', color: 'border-teal-200 bg-teal-50/80 text-teal-700 hover:bg-teal-100/50' },
+  { id: 'Pull', label: '풀 (Pull)', color: 'border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100/50' },
+  { id: 'Push', label: '푸쉬 (Push)', color: 'border-red-200 bg-red-50/80 text-red-700 hover:bg-red-100/50' },
+  { id: 'Leg', label: '레그 (Leg)', color: 'border-amber-200 bg-amber-50/80 text-amber-700 hover:bg-amber-100/50' },
+  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', color: 'border-cyan-200 bg-cyan-50/80 text-cyan-700 hover:bg-cyan-100/50' },
+  { id: 'Full', label: '전신 (Full)', color: 'border-fuchsia-200 bg-fuchsia-50/80 text-fuchsia-700 hover:bg-fuchsia-100/50' },
+  { id: 'Running', label: '러닝 (Running)', color: 'border-blue-200 bg-blue-50/80 text-blue-700 hover:bg-blue-100/50' },
+  { id: 'Tennis', label: '테니스 (Tennis)', color: 'border-lime-200 bg-lime-50/80 text-lime-700 hover:bg-lime-100/50' },
+  { id: 'Rest', label: '휴식 (Rest)', color: 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200/50' },
+  { id: 'Other', label: '기타 (Other)', color: 'border-pink-200 bg-pink-50/80 text-pink-700 hover:bg-pink-100/50' },
 ]
 
 export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
