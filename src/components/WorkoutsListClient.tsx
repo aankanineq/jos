@@ -17,15 +17,15 @@ interface WorkoutsListClientProps {
 }
 
 const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: string; activeColor: string }[] = [
-  { id: 'Pull', label: '풀 (Pull)', icon: '💪', color: 'border-indigo-200 bg-indigo-50/40 text-indigo-700 hover:bg-indigo-50/80', activeColor: 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-100/50' },
-  { id: 'Push', label: '푸쉬 (Push)', icon: '🔥', color: 'border-red-200 bg-red-50/40 text-red-700 hover:bg-red-50/80', activeColor: 'bg-red-600 text-white border-red-600 shadow-red-100/50' },
-  { id: 'Leg', label: '레그 (Leg)', icon: '🦵', color: 'border-amber-200 bg-amber-50/40 text-amber-700 hover:bg-amber-50/80', activeColor: 'bg-amber-500 text-white border-amber-500 shadow-amber-100/50' },
-  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-cyan-200 bg-cyan-50/40 text-cyan-700 hover:bg-cyan-50/80', activeColor: 'bg-cyan-600 text-white border-cyan-600 shadow-cyan-100/50' },
-  { id: 'Full', label: '전신 (Full)', icon: '🏋️', color: 'border-fuchsia-200 bg-fuchsia-50/40 text-fuchsia-700 hover:bg-fuchsia-50/80', activeColor: 'bg-fuchsia-600 text-white border-fuchsia-600 shadow-fuchsia-100/50' },
-  { id: 'Running', label: '러닝 (Running)', icon: '🏃', color: 'border-blue-200 bg-blue-50/40 text-blue-700 hover:bg-blue-50/80', activeColor: 'bg-blue-600 text-white border-blue-600 shadow-blue-100/50' },
-  { id: 'Tennis', label: '테니스 (Tennis)', icon: '🎾', color: 'border-lime-200 bg-lime-50/40 text-lime-700 hover:bg-lime-50/80', activeColor: 'bg-lime-600 text-white border-lime-600 shadow-lime-100/50' },
-  { id: 'Rest', label: '휴식 (Rest)', icon: '🛌', color: 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100', activeColor: 'bg-slate-700 text-white border-slate-700 shadow-slate-100/50' },
-  { id: 'Other', label: '기타 (Other)', icon: '📝', color: 'border-pink-200 bg-pink-50/40 text-pink-700 hover:bg-pink-50/80', activeColor: 'bg-pink-600 text-white border-pink-600 shadow-pink-100/50' },
+  { id: 'Pull', label: '풀 (Pull)', icon: '💪', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Push', label: '푸쉬 (Push)', icon: '🔥', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Leg', label: '레그 (Leg)', icon: '🦵', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Full', label: '전신 (Full)', icon: '🏋️', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Running', label: '러닝 (Running)', icon: '🏃', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Tennis', label: '테니스 (Tennis)', icon: '🎾', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Rest', label: '휴식 (Rest)', icon: '🛌', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Other', label: '기타 (Other)', icon: '📝', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
 ]
 
 const TYPE_LABELS: Record<string, string> = {
@@ -40,7 +40,6 @@ const TYPE_LABELS: Record<string, string> = {
   Other: '기타 (Other)',
   'Shoulder, Arm': '어깨팔 (Shoulder, Arm)'
 }
-
 
 export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClientProps) {
   const router = useRouter()
@@ -75,18 +74,15 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
   // 2. Filter Workouts based on selection states
   const filteredWorkouts = useMemo(() => {
     return initialWorkouts.filter((w) => {
-      // Filter by Month
       if (selectedMonth !== 'all') {
         const month = w.workout_date.slice(0, 7)
         if (month !== selectedMonth) return false
       }
 
-      // Filter by Workout Type
       if (selectedType !== 'all') {
         if (w.type !== selectedType) return false
       }
 
-      // Filter by Search Query (searches in type, notes, and markdown)
       if (searchQuery.trim() !== '') {
         const query = searchQuery.toLowerCase()
         const matchType = w.type.toLowerCase().includes(query)
@@ -106,7 +102,6 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
     const completed = filteredWorkouts.filter(w => w.status === 'completed').length
     const planned = filteredWorkouts.filter(w => w.status === 'planned').length
     
-    // Running specific stats (only computed from Running + completed)
     let runningDistSum = 0
     let runningDurationSumSec = 0
     let runningCount = 0
@@ -188,17 +183,20 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in pb-24 max-w-4xl mx-auto px-4 md:px-0">
+    <div className="space-y-10 animate-in fade-in pb-28 max-w-4xl mx-auto px-4 md:px-0">
       
       {/* Header */}
       <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
-        <div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-            <Dumbbell className="w-9 h-9 text-slate-800" />
+        <div className="space-y-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-extrabold tracking-wider uppercase">
+            <Dumbbell className="w-3.5 h-3.5 text-slate-800" />
+            WORKOUT JOURNAL
+          </div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mt-1">
             Workouts
           </h1>
-          <p className="text-slate-500 mt-1.5 font-semibold tracking-wide">
-            모든 운동 기록을 필터링 및 검색을 통해 편리하게 관리하세요.
+          <p className="text-slate-500 font-semibold tracking-wide">
+            모든 운동 기록을 편리하게 관리하고 분석해 보세요.
           </p>
         </div>
         
@@ -210,10 +208,10 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
               setIsDeleteMode(!isDeleteMode)
               setSelectedDeleteIds([])
             }}
-            className={`inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-102 active:scale-98 cursor-pointer text-sm border ${
+            className={`inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-101 active:scale-99 cursor-pointer text-sm border ${
               isDeleteMode 
                 ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
-                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-350 hover:text-slate-800'
+                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-900'
             }`}
           >
             <Trash2 className="w-4.5 h-4.5" />
@@ -223,7 +221,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
           {!isDeleteMode && (
             <Link
               href="/workouts/new"
-              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-102 active:scale-98 cursor-pointer text-sm"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-[1.01] active:scale-[0.99] cursor-pointer text-sm"
             >
               <PlusCircle className="w-5 h-5" />
               새 기록 추가
@@ -234,22 +232,22 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
 
       {/* Bulk Delete Bar */}
       {isDeleteMode && selectedDeleteIds.length > 0 && (
-        <div className="retro-card p-4 bg-rose-50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-bottom-5 duration-300">
+        <div className="retro-card p-5 bg-rose-50 border border-rose-100 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-bottom-5 duration-350">
           <p className="text-sm font-bold text-rose-700 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             선택한 **{selectedDeleteIds.length}개**의 운동 기록을 완전히 삭제하시겠습니까?
           </p>
-          <div className="flex gap-2 shrink-0">
+          <div className="flex gap-2.5 shrink-0">
             <button
               onClick={() => setSelectedDeleteIds([])}
-              className="px-4 py-2 rounded-xl bg-white border border-rose-200 text-rose-600 font-bold text-xs hover:bg-rose-100 active:scale-97 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-white border border-rose-200 text-rose-600 font-bold text-xs hover:bg-rose-100 active:scale-97 cursor-pointer"
             >
               선택 해제
             </button>
             <button
               onClick={handleBulkDelete}
               disabled={deleting}
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300 text-white font-bold text-xs shadow-sm active:scale-97 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300 text-white font-bold text-xs shadow-sm active:scale-97 cursor-pointer"
             >
               {deleting ? '지우는 중...' : '선택 삭제 실행'}
             </button>
@@ -258,9 +256,9 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
       )}
 
       {/* Filter and Search Panel */}
-      <div className="retro-card p-6 sm:p-7 bg-white border border-slate-100 space-y-6">
+      <div className="retro-card p-6 sm:p-8 bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] space-y-6">
         
-        {/* Row 1: Period Selection (Month - Collapsible) */}
+        {/* Row 1: Period Selection */}
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
@@ -268,29 +266,23 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
               기간 선택 (Period)
             </label>
             
-            {/* Expand / Collapse Toggle Button */}
             <button
               type="button"
               onClick={() => setIsPeriodFilterOpen(!isPeriodFilterOpen)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
             >
               <span>현재 선택: <strong>{selectedMonth === 'all' ? '전체 기간' : formatMonthLabel(selectedMonth)}</strong></span>
-              {isPeriodFilterOpen ? (
-                <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-              )}
+              {isPeriodFilterOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
           </div>
-
-          {/* Period Panel with Smooth Collapse/Expand */}
+ 
           {isPeriodFilterOpen && (
             <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedMonth('all')
-                  setIsPeriodFilterOpen(false) // Close panel after selection to save space
+                  setIsPeriodFilterOpen(false)
                 }}
                 className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
                   selectedMonth === 'all'
@@ -306,7 +298,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                   type="button"
                   onClick={() => {
                     setSelectedMonth(m)
-                    setIsPeriodFilterOpen(false) // Close panel after selection to save space
+                    setIsPeriodFilterOpen(false)
                   }}
                   className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 ${
                     selectedMonth === m
@@ -321,7 +313,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
           )}
         </div>
 
-        {/* Row 2: Workout Type Selection (Collapsible Horizontal Pills) */}
+        {/* Row 2: Workout Type Selection */}
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
@@ -329,29 +321,23 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
               운동 종류별 보기 (Workout Type)
             </label>
             
-            {/* Expand / Collapse Toggle Button */}
             <button
               type="button"
               onClick={() => setIsTypeFilterOpen(!isTypeFilterOpen)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200/80 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
             >
               <span>현재 선택: <strong>{TYPE_LABELS[selectedType] || selectedType}</strong></span>
-              {isTypeFilterOpen ? (
-                <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
-              ) : (
-                <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-              )}
+              {isTypeFilterOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
             </button>
           </div>
           
-          {/* Pills Panel with Smooth Collapse/Expand */}
           {isTypeFilterOpen && (
             <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
               <button
                 type="button"
                 onClick={() => {
                   setSelectedType('all')
-                  setIsTypeFilterOpen(false) // Close panel after selection to save space
+                  setIsTypeFilterOpen(false)
                 }}
                 className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
                   selectedType === 'all'
@@ -369,7 +355,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                     type="button"
                     onClick={() => {
                       setSelectedType(t.id)
-                      setIsTypeFilterOpen(false) // Close panel after selection to save space
+                      setIsTypeFilterOpen(false)
                     }}
                     className={`px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 ${
                       isSelected
@@ -377,6 +363,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                         : `${t.color} border`
                     }`}
                   >
+                    <span>{t.icon}</span>
                     {t.label}
                   </button>
                 )
@@ -386,31 +373,31 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
         </div>
 
         {/* Row 3: Live Search */}
-        <div className="pt-2 border-t border-slate-50 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="날짜, 메모, 운동 내용 실시간 검색..."
-              className="w-full bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl pl-10 pr-4 py-3 text-sm focus:outline-none transition-all placeholder:text-slate-400"
+              className="w-full bg-slate-50/50 border border-slate-200/80 rounded-2xl pl-11 pr-10 py-3.5 text-sm focus:outline-none transition-all placeholder:text-slate-400 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 font-semibold shadow-inner"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-200"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-650 rounded-full hover:bg-slate-150 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          {/* Active Filter Indicators / Clear Filters */}
+          {/* Active Filter Indicators */}
           {(selectedMonth !== 'all' || selectedType !== 'all' || searchQuery !== '') && (
             <button
               onClick={handleClearFilters}
-              className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1.5 py-2 px-3 border border-slate-100 hover:border-slate-200 rounded-xl bg-slate-50/50 cursor-pointer active:scale-97"
+              className="text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors flex items-center gap-1.5 py-2 px-3 border border-slate-150 rounded-xl bg-slate-50/50 cursor-pointer active:scale-97"
             >
               <X className="w-3.5 h-3.5" />
               필터 초기화
@@ -419,78 +406,77 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
         </div>
       </div>
 
-      {/* Dynamic Statistics Panel (Aesthetic Wow Card) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Dynamic Statistics Panel */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
         
         {/* Card 1: Total count */}
-        <div className="retro-card p-5 bg-white border border-slate-100 flex flex-col justify-between">
+        <div className="retro-card p-6 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between text-slate-400">
               <span className="text-[10px] font-black uppercase tracking-wider">필터링된 기록</span>
-              <Sparkles className="w-4 h-4 text-slate-300" />
+              <Sparkles className="w-4.5 h-4.5 text-slate-350" />
             </div>
-            <p className="text-2xl font-black text-slate-900 mt-2">{stats.total}건</p>
+            <p className="text-3xl font-black text-slate-950 mt-2">{stats.total}건</p>
           </div>
-          <p className="text-xs text-slate-400 font-bold mt-3">
+          <p className="text-xs text-slate-400 font-bold mt-4">
             완료: {stats.completed}건 | 계획: {stats.planned}건
           </p>
         </div>
 
-        {/* Running Cumulative Stats Cards (Only if Running is filtered or exists in set) */}
+        {/* Running Cumulative Stats Cards */}
         {selectedType === 'Running' || (selectedType === 'all' && stats.runningCount > 0) ? (
           <>
             {/* Card 2: Running Cumulative Distance */}
-            <div className="retro-card p-5 bg-white border border-slate-100 flex flex-col justify-between">
+            <div className="retro-card p-6 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-blue-500">
+                <div className="flex items-center justify-between text-rose-500">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">러닝 누적 거리</span>
-                  <TrendingUp className="w-4 h-4" />
+                  <TrendingUp className="w-4.5 h-4.5" />
                 </div>
-                <p className="text-2xl font-black text-slate-900 mt-2">{stats.runningDistSum} km</p>
+                <p className="text-3xl font-black text-slate-950 mt-2">{stats.runningDistSum} km</p>
               </div>
-              <p className="text-xs text-slate-400 font-bold mt-3">
-                총 {stats.runningCount}회 러닝 세션
+              <p className="text-xs text-slate-400 font-bold mt-4">
+                총 {stats.runningCount}회 러닝 완주
               </p>
             </div>
 
             {/* Card 3: Running Cumulative Duration */}
-            <div className="retro-card p-5 bg-white border border-slate-100 flex flex-col justify-between">
+            <div className="retro-card p-6 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-blue-500">
+                <div className="flex items-center justify-between text-orange-500">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">러닝 누적 시간</span>
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-4.5 h-4.5" />
                 </div>
-                <p className="text-2xl font-black text-slate-900 mt-2">
+                <p className="text-3xl font-black text-slate-950 mt-2 whitespace-nowrap overflow-hidden text-ellipsis">
                   {stats.runningDurationSumSec > 0 ? formatDuration(stats.runningDurationSumSec) : '0분'}
                 </p>
               </div>
-              <p className="text-xs text-slate-400 font-bold mt-3">
-                정밀 기록 누적 기준
+              <p className="text-xs text-slate-400 font-bold mt-4">
+                기록 누계 기준
               </p>
             </div>
 
             {/* Card 4: Average Running Pace */}
-            <div className="retro-card p-5 bg-white border border-slate-100 flex flex-col justify-between">
+            <div className="retro-card p-6 bg-white border border-slate-100 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between text-blue-500">
+                <div className="flex items-center justify-between text-emerald-500">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider">러닝 평균 페이스</span>
-                  <Flame className="w-4 h-4" />
+                  <Flame className="w-4.5 h-4.5" />
                 </div>
-                <p className="text-2xl font-black text-slate-900 mt-2">{stats.avgPaceStr || "N/A"}</p>
+                <p className="text-3xl font-black text-slate-950 mt-2">{stats.avgPaceStr || "N/A"}</p>
               </div>
-              <p className="text-xs text-slate-400 font-bold mt-3">
-                구간 통합 평균치
+              <p className="text-xs text-slate-400 font-bold mt-4">
+                전체 기록 평균
               </p>
             </div>
           </>
         ) : (
           /* Show simple counts of other types for balance */
-          <div className="col-span-3 retro-card p-5 bg-slate-50/50 border border-slate-100 flex items-center justify-center text-center">
-            <div className="space-y-1">
-              <p className="text-xs font-bold text-slate-400">💡 꿀팁</p>
-              <p className="text-xs font-semibold text-slate-500 leading-normal">
-                운동 종류를 <strong>러닝 (Running)</strong>으로 설정하시면 누적 거리, 누적 시간, 평균 페이스 등<br />
-                풍부한 달리기 전용 유산소 데이터 분석 보드를 추가로 확인할 수 있습니다.
+          <div className="col-span-3 retro-card p-6 bg-slate-50/40 border border-slate-100 rounded-3xl flex items-center justify-center text-center">
+            <div className="space-y-1 max-w-md">
+              <p className="text-xs font-bold text-slate-400 tracking-wider">💡 TIP</p>
+              <p className="text-xs font-semibold text-slate-500 leading-relaxed">
+                운동 종류를 <strong>러닝 (Running)</strong>으로 필터링하시면 누적 거리, 누적 시간, 평균 페이스 등 풍부한 달리기 전용 유산소 데이터 분석 보드를 추가로 제공합니다.
               </p>
             </div>
           </div>
@@ -499,20 +485,20 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
 
       {/* Filtered Workouts List */}
       {filteredWorkouts.length === 0 ? (
-        <div className="retro-card p-12 text-center flex flex-col items-center justify-center bg-white border border-slate-100">
-          <AlertCircle className="w-12 h-12 text-slate-350 mb-4 opacity-40" />
+        <div className="retro-card p-12 text-center flex flex-col items-center justify-center bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+          <AlertCircle className="w-12 h-12 text-slate-350 mb-4 opacity-40 animate-pulse" />
           <p className="text-slate-600 mb-2 font-extrabold text-lg">일치하는 운동 기록이 없습니다.</p>
-          <p className="text-slate-400 text-xs font-semibold mb-4">선택하신 기간이나 종류 필터를 조정하거나, 실시간 검색어를 지워보세요.</p>
+          <p className="text-slate-450 text-xs font-semibold mb-6">선택하신 기간이나 종류 필터를 조정하거나, 실시간 검색어를 지워보세요.</p>
           <button
             onClick={handleClearFilters}
-            className="inline-flex bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm active:scale-97 cursor-pointer text-xs"
+            className="inline-flex bg-slate-900 hover:bg-slate-800 text-white px-5 py-3 rounded-2xl font-bold transition-all shadow-sm active:scale-97 cursor-pointer text-xs"
           >
             모든 필터 지우기
           </button>
         </div>
       ) : (
-        <div className="retro-card overflow-hidden bg-white border border-slate-100">
-          <div className="divide-y divide-slate-100 animate-in fade-in duration-255">
+        <div className="retro-card overflow-hidden bg-white border border-slate-100/80 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+          <div className="divide-y divide-slate-100/70 animate-in fade-in duration-250">
             {filteredWorkouts.map((w) => {
               const isSelected = selectedDeleteIds.includes(w.id)
               
@@ -526,12 +512,12 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                       toggleDeleteSelection(w.id)
                     }
                   }}
-                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all duration-300 group gap-4 cursor-pointer ${
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-5 transition-all duration-300 group gap-4 cursor-pointer ${
                     isDeleteMode 
                       ? isSelected 
                         ? 'bg-rose-50/40 hover:bg-rose-50/60' 
                         : 'hover:bg-slate-50/40'
-                      : 'hover:bg-slate-50/50'
+                      : 'hover:bg-slate-50/40'
                   }`}
                 >
                   <div className="flex items-center gap-4">
@@ -542,7 +528,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                           type="checkbox"
                           checked={isSelected}
                           readOnly
-                          className="w-5 h-5 text-rose-600 focus:ring-rose-500 border-slate-300 rounded cursor-pointer transition-all"
+                          className="w-5 h-5 text-rose-600 focus:ring-rose-500 border-slate-350 rounded cursor-pointer transition-all"
                         />
                       </div>
                     )}
@@ -551,21 +537,21 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                     <WorkoutArtwork type={w.type} status={w.status} size="sm" />
                     
                     <div>
-                      <div className="flex flex-wrap items-center gap-2.5 mb-1">
+                      <div className="flex flex-wrap items-center gap-2.5 mb-1.5">
                         <h4 className="font-extrabold text-slate-900 text-lg tracking-wide group-hover:text-slate-800 transition-colors">
                           {w.type}
                         </h4>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-lg font-black uppercase tracking-wider ${
+                        <span className={`text-[10px] px-2.5 py-0.5 rounded-lg font-black uppercase tracking-wider ${
                           w.status === 'completed' 
-                            ? 'bg-slate-900 text-white border border-slate-900 shadow-sm shadow-slate-100/50' 
-                            : 'bg-white text-slate-400 border border-slate-200 font-extrabold'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' 
+                            : 'bg-slate-50 text-slate-400 border border-slate-200 font-extrabold'
                         }`}>
                           {w.status === 'completed' ? '완료' : '계획'}
                         </span>
                       </div>
 
                       {w.type === 'Running' && w.running_distance_km ? (
-                        <p className="text-sm font-semibold text-slate-500">
+                        <p className="text-sm font-bold text-slate-500 leading-normal">
                           {w.running_distance_km}km
                           {w.running_duration_sec && (() => {
                             const h = Math.floor(w.running_duration_sec / 3600)
@@ -575,7 +561,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                           })()}
                         </p>
                       ) : (
-                        <p className="text-sm text-slate-500 line-clamp-1 max-w-md font-semibold">
+                        <p className="text-sm text-slate-500 line-clamp-1 max-w-md font-bold leading-normal">
                           {w.markdown ? w.markdown.split('\n')[0].replace(/^#+\s/, '') : '상세 기록 없음'}
                         </p>
                       )}
@@ -598,7 +584,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                         }`} />
                       </div>
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-650 transition-all hover:scale-102" />
                     )}
                   </div>
                 </Link>

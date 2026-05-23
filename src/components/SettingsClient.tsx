@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { 
-  Download, LogOut, Settings as SettingsIcon, Calendar, Activity, 
-  Check, ShieldAlert, Upload, FileText, CheckCircle, AlertCircle, 
+  Download, Settings as SettingsIcon, Calendar, Activity, 
+  Check, Upload, FileText, CheckCircle, AlertCircle, 
   Loader2, ChevronDown, ChevronUp, Copy 
 } from 'lucide-react'
 import { format } from 'date-fns'
@@ -66,7 +66,7 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
        status: completed
        running_distance_km: 숫자
        duration: H:MM:SS
-       memo: 기준앱: Nike / 유형: ... / 위치: ... / 평균 페이스: ... / 칼로리: ... / 고도 상승: ... / 평균 심박수: ... / 케이던스: ... / 신발: ... / 구간: ... / 해석: ...
+       memo: 기준앱: Nike / 유형: 이지런 / 위치: 한강공원 ...
 
      - running_distance_km: 0보다 큰 숫자 형태여야 합니다 (소수점 지원).
      - duration: 시간(Hour), 분(Minute), 초(Second)가 콜론으로 구분된 'H:MM:SS' 규격을 엄격히 지켜야 합니다.
@@ -164,15 +164,15 @@ interface SettingsClientProps {
 }
 
 const WORKOUT_TYPES = [
-  { id: 'Pull', label: '풀 (Pull)', color: 'border-indigo-200 bg-indigo-50/80 text-indigo-700 hover:bg-indigo-100/50' },
-  { id: 'Push', label: '푸쉬 (Push)', color: 'border-red-200 bg-red-50/80 text-red-700 hover:bg-red-100/50' },
-  { id: 'Leg', label: '레그 (Leg)', color: 'border-amber-200 bg-amber-50/80 text-amber-700 hover:bg-amber-100/50' },
-  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', color: 'border-cyan-200 bg-cyan-50/80 text-cyan-700 hover:bg-cyan-100/50' },
-  { id: 'Full', label: '전신 (Full)', color: 'border-fuchsia-200 bg-fuchsia-50/80 text-fuchsia-700 hover:bg-fuchsia-100/50' },
-  { id: 'Running', label: '러닝 (Running)', color: 'border-blue-200 bg-blue-50/80 text-blue-700 hover:bg-blue-100/50' },
-  { id: 'Tennis', label: '테니스 (Tennis)', color: 'border-lime-200 bg-lime-50/80 text-lime-700 hover:bg-lime-100/50' },
-  { id: 'Rest', label: '휴식 (Rest)', color: 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200/50' },
-  { id: 'Other', label: '기타 (Other)', color: 'border-pink-200 bg-pink-50/80 text-pink-700 hover:bg-pink-100/50' },
+  { id: 'Pull', label: '💪 풀 (Pull)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Push', label: '🔥 푸쉬 (Push)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Leg', label: '🦵 레그 (Leg)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Full', label: '🏋️ 전신 (Full)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Running', label: '🏃 러닝 (Running)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Tennis', label: '🎾 테니스 (Tennis)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Rest', label: '🛌 휴식 (Rest)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+  { id: 'Other', label: '📝 기타 (Other)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
 ]
 
 export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
@@ -212,7 +212,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
     }, 2000)
   }
 
-  // Convert YYYY-MM to Korean Date (e.g. 2026년 05월)
   const formatMonthLabel = (m: string) => {
     const [year, month] = m.split('-')
     return `${year}년 ${month}월`
@@ -304,7 +303,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
         setPreviewStats(data.stats)
         setPreviewBlocks(data.blocks)
         
-        // Auto-select valid and warning blocks by default
         const initialSelected = data.blocks
           .filter((b: any) => b.type === 'valid' || b.type === 'warning')
           .map((b: any) => b.blockIndex)
@@ -347,7 +345,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
       const data = await res.json()
       if (res.ok && data.success) {
         setCommitSuccessCount(data.count)
-        // Clear preview states on successful storage
         setPreviewStats(null)
         setPreviewBlocks(null)
         setSelectedBlockIndexes([])
@@ -363,20 +360,27 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in pb-24 max-w-2xl mx-auto px-4 md:px-0">
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-          <SettingsIcon className="w-9 h-9 text-slate-800" />
+    <div className="space-y-10 animate-in fade-in pb-28 max-w-2xl mx-auto px-4 md:px-0">
+      
+      {/* Header */}
+      <header className="mb-8 space-y-1">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-extrabold tracking-wider uppercase">
+          <SettingsIcon className="w-3.5 h-3.5 text-slate-800" />
+          SYSTEM SETTINGS
+        </div>
+        <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mt-1">
           Settings
         </h1>
-        <p className="text-slate-500 mt-1.5 font-semibold tracking-wide">데이터 관리 및 계정 관련 설정입니다.</p>
+        <p className="text-slate-500 font-semibold tracking-wide">데이터 백업 관리 및 계정 관련 설정입니다.</p>
       </header>
 
       {/* 1. Selective Data Import Section */}
-      <section className="retro-card p-6 sm:p-8 space-y-8">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <Upload className="w-6 h-6 text-slate-800" />
-          <h2 className="text-xl font-bold text-slate-900 tracking-wide">데이터 가져오기 (Import)</h2>
+      <section className="retro-card p-6 sm:p-8 space-y-8 bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
+          <span className="p-2 rounded-2xl bg-slate-50 border border-slate-100 text-slate-850 flex items-center justify-center">
+            <Upload className="w-5 h-5" />
+          </span>
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight">데이터 가져오기 (Import)</h2>
         </div>
 
         <div className="space-y-6">
@@ -390,7 +394,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
               value={pasteText}
               onChange={(e) => setPasteText(e.target.value)}
               placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;memo: 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.&#10;---"
-              className="w-full min-h-[220px] bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-300"
+              className="w-full min-h-[220px] bg-slate-50/50 border border-slate-200/80 focus:border-slate-400 focus:ring-2 focus:ring-slate-900/5 focus:border-slate-900 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-350 shadow-inner leading-relaxed"
             />
             
             <div className="flex justify-end">
@@ -398,16 +402,16 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                 type="button"
                 onClick={() => executeImport(pasteText)}
                 disabled={importing || !pasteText.trim()}
-                className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-450 px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed text-sm"
               >
                 {importing ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    가져오는 중...
+                    분석 분석 중...
                   </>
                 ) : (
                   <>
-                    <Check className="w-4 h-4" />
+                    <FileText className="w-4 h-4" />
                     기록 가져오기 실행
                   </>
                 )}
@@ -417,11 +421,11 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 
           {/* Commit Success Notification Banner */}
           {commitSuccessCount !== null && (
-            <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-100 text-emerald-900 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <CheckCircle className="w-6 h-6 mt-0.5 shrink-0 text-emerald-600" />
+            <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-100 text-emerald-950 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <CheckCircle className="w-6 h-6 shrink-0 text-emerald-600 mt-0.5" />
               <div className="space-y-1">
-                <h4 className="font-extrabold text-base">🎉 데이터 저장 성공!</h4>
-                <p className="text-sm font-semibold text-emerald-700 leading-relaxed">
+                <h4 className="font-black text-base">🎉 데이터 저장 성공!</h4>
+                <p className="text-xs sm:text-sm font-semibold text-emerald-700 leading-relaxed">
                   선택하신 **총 {commitSuccessCount}개**의 운동 기록이 JOS 데이터베이스에 성공적으로 추가(Insert)되었습니다. 캘린더에서 바로 확인할 수 있습니다.
                 </p>
               </div>
@@ -430,14 +434,14 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 
           {/* Commit Errors Notification Banner */}
           {commitError && commitError.length > 0 && (
-            <div className="p-5 rounded-3xl bg-rose-50 border border-rose-100 text-rose-900 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-              <AlertCircle className="w-6 h-6 mt-0.5 shrink-0 text-rose-600" />
+            <div className="p-5 rounded-3xl bg-rose-50 border border-rose-100 text-rose-950 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-6 h-6 shrink-0 text-rose-600 mt-0.5" />
               <div className="space-y-2 w-full">
-                <h4 className="font-extrabold text-base">⚠️ 데이터 저장 실패</h4>
-                <p className="text-sm font-semibold text-rose-700">
+                <h4 className="font-black text-base">⚠️ 데이터 저장 실패</h4>
+                <p className="text-xs sm:text-sm font-semibold text-rose-700">
                   최종 저장 도중 다음과 같은 유효성 검사 에러가 발생하여 처리가 차단되었습니다:
                 </p>
-                <div className="bg-white/80 border border-rose-100 rounded-2xl p-4 text-xs font-mono leading-relaxed space-y-1.5 max-h-[150px] overflow-y-auto w-full text-rose-800">
+                <div className="bg-white/80 border border-rose-100 rounded-2xl p-4 text-xs font-mono leading-relaxed space-y-1.5 max-h-[150px] overflow-y-auto w-full text-rose-800 font-semibold shadow-inner">
                   {commitError.map((err, idx) => (
                     <div key={idx}>• {err}</div>
                   ))}
@@ -448,49 +452,47 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 
           {/* Import Preview Dashboard */}
           {previewBlocks && previewStats && (
-            <div className="space-y-6 bg-slate-50/50 border border-slate-100 rounded-3xl p-5 sm:p-6 animate-in fade-in duration-300">
-              {/* Summary Stats Header */}
+            <div className="space-y-6 bg-slate-50/30 border border-slate-100/80 rounded-3xl p-5 sm:p-7 animate-in fade-in duration-300">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
                     🔎 마크다운 가져오기 프리뷰 (Preview)
                   </h3>
-                  <span className="text-[10px] px-2 py-0.5 bg-slate-200 text-slate-700 font-extrabold rounded-full uppercase">
+                  <span className="text-[10px] px-2 py-0.5 bg-slate-200 text-slate-700 font-extrabold rounded-full uppercase tracking-wider">
                     JOS v1 SPEC
                   </span>
                 </div>
-                <p className="text-xs font-semibold text-slate-500 leading-relaxed">
+                <p className="text-xs font-bold text-slate-450 leading-relaxed">
                   가져온 마크다운 파일 내의 운동 블록별 상태 분석 결과입니다. <strong>Valid(정상)</strong> 및 체크된 <strong>Warning(경고)</strong> 블록만 데이터베이스에 신규 추가(Insert)됩니다.
                 </p>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-4 gap-2.5 pt-2 text-center">
-                  <div className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">총 블록</p>
-                    <p className="text-xl font-black text-slate-800 mt-1">{previewStats.totalCount}</p>
+                <div className="grid grid-cols-4 gap-3 pt-2 text-center">
+                  <div className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col justify-center">
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider">총 블록</p>
+                    <p className="text-xl font-black text-slate-900 mt-1">{previewStats.totalCount}</p>
                   </div>
-                  <div className="p-3 bg-white border border-emerald-100 rounded-2xl shadow-sm">
-                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-wider">저장 가능</p>
+                  <div className="p-3 bg-white border border-emerald-100 rounded-2xl shadow-sm flex flex-col justify-center">
+                    <p className="text-[9px] font-black text-emerald-500 uppercase tracking-wider">저장 가능</p>
                     <p className="text-xl font-black text-emerald-600 mt-1">{previewStats.validCount}</p>
                   </div>
-                  <div className="p-3 bg-white border border-amber-100 rounded-2xl shadow-sm">
-                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-wider">경고 있음</p>
+                  <div className="p-3 bg-white border border-amber-100 rounded-2xl shadow-sm flex flex-col justify-center">
+                    <p className="text-[9px] font-black text-amber-500 uppercase tracking-wider">경고 있음</p>
                     <p className="text-xl font-black text-amber-600 mt-1">{previewStats.warningCount}</p>
                   </div>
-                  <div className="p-3 bg-white border border-rose-100 rounded-2xl shadow-sm">
-                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider">저장 불가</p>
+                  <div className="p-3 bg-white border border-rose-100 rounded-2xl shadow-sm flex flex-col justify-center">
+                    <p className="text-[9px] font-black text-rose-500 uppercase tracking-wider">저장 불가</p>
                     <p className="text-xl font-black text-rose-600 mt-1">{previewStats.invalidCount}</p>
                   </div>
                 </div>
               </div>
 
               {/* Scrollable Preview Blocks List */}
-              <div className="max-h-[360px] overflow-y-auto border border-slate-100 rounded-2xl p-4 bg-white/60 space-y-3.5 divide-y divide-slate-100/50">
+              <div className="max-h-[360px] overflow-y-auto border border-slate-100 rounded-2xl p-4 bg-white/70 space-y-3.5 divide-y divide-slate-100/50">
                 {previewBlocks.map((b) => {
                   const isValid = b.type === 'valid'
                   const isWarning = b.type === 'warning'
                   const isInvalid = b.type === 'invalid'
-                  
                   const isChecked = selectedBlockIndexes.includes(b.blockIndex)
 
                   return (
@@ -502,7 +504,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                         'border-l-rose-500 bg-rose-50/10 border border-slate-100'
                       }`}
                     >
-                      {/* Block Header Area */}
                       <div className="flex items-start justify-between gap-3">
                         <div className="space-y-0.5">
                           <h4 className="font-extrabold text-sm text-slate-800 tracking-wide font-mono">
@@ -511,7 +512,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                           {b.workout && (
                             <div className="flex items-center gap-2 mt-1">
                               <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase ${
-                                b.workout.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                                b.workout.status === 'completed' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
                               }`}>
                                 {b.workout.status}
                               </span>
@@ -524,14 +525,13 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                           )}
                         </div>
 
-                        {/* Controls (Checkbox for Valid/Warning, cross for Invalid) */}
                         <div className="shrink-0 pt-0.5">
                           {isInvalid ? (
                             <span className="text-[10px] font-black text-rose-500 bg-rose-100/50 px-2.5 py-1 rounded-full flex items-center gap-1">
                               <AlertCircle className="w-3.5 h-3.5" /> 저장 불가
                             </span>
                           ) : (
-                            <label className="flex items-center gap-1.5 cursor-pointer">
+                            <label className="flex items-center gap-1.5 cursor-pointer select-none">
                               <input
                                 type="checkbox"
                                 checked={isChecked}
@@ -542,7 +542,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                                     setSelectedBlockIndexes(selectedBlockIndexes.filter(idx => idx !== b.blockIndex))
                                   }
                                 }}
-                                className="w-4 h-4 text-slate-900 focus:ring-slate-900 border-slate-300 rounded cursor-pointer"
+                                className="w-4.5 h-4.5 text-slate-900 focus:ring-slate-900 border-slate-300 rounded cursor-pointer"
                               />
                               <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
                                 isChecked 
@@ -556,9 +556,8 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                         </div>
                       </div>
 
-                      {/* Errors and Warnings lists */}
                       {b.errors.length > 0 && (
-                        <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3 text-[11px] font-semibold text-rose-700 space-y-1">
+                        <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3 text-[11px] font-semibold text-rose-700 space-y-1 shadow-inner">
                           {b.errors.map((err: string, idx: number) => (
                             <div key={idx} className="flex items-start gap-1">
                               <span className="shrink-0 mt-0.5 text-rose-600">❌</span>
@@ -569,7 +568,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                       )}
 
                       {b.warnings.length > 0 && (
-                        <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 text-[11px] font-semibold text-amber-700 space-y-1">
+                        <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 text-[11px] font-semibold text-amber-700 space-y-1 shadow-inner">
                           {b.warnings.map((warn: string, idx: number) => (
                             <div key={idx} className="flex items-start gap-1">
                               <span className="shrink-0 mt-0.5 text-amber-600">⚠️</span>
@@ -579,9 +578,8 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                         </div>
                       )}
 
-                      {/* Workout markdown snippet preview */}
                       {b.workout && b.workout.markdown && (
-                        <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 text-xs leading-relaxed font-semibold text-slate-500 whitespace-pre-wrap max-h-[80px] overflow-y-auto font-mono">
+                        <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 text-xs leading-relaxed font-semibold text-slate-500 whitespace-pre-wrap max-h-[80px] overflow-y-auto font-mono shadow-inner">
                           {b.workout.markdown}
                         </div>
                       )}
@@ -604,7 +602,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                       setPreviewStats(null);
                       setSelectedBlockIndexes([]);
                     }}
-                    className="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 font-bold text-sm transition-colors cursor-pointer"
+                    className="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-500 hover:text-slate-900 font-bold text-sm transition-colors cursor-pointer"
                   >
                     취소
                   </button>
@@ -612,7 +610,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                     type="button"
                     onClick={handleCommit}
                     disabled={isCommitting || selectedBlockIndexes.length === 0}
-                    className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed text-sm"
+                    className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-450 px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed text-sm"
                   >
                     {isCommitting ? (
                       <>
@@ -631,34 +629,33 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             </div>
           )}
 
-          {/* Form Help / Formatting Rules Accordion */}
+          {/* Form Help / Accordion */}
           <div className="border border-slate-100 rounded-2xl overflow-hidden transition-all bg-slate-50/40">
             <button
               type="button"
               onClick={() => setShowHelp(!showHelp)}
-              className="w-full px-4 py-3 justify-between flex items-center font-bold text-xs text-slate-600 hover:text-slate-800 transition-colors cursor-pointer"
+              className="w-full px-4.5 py-3.5 justify-between flex items-center font-bold text-xs text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-1.5">
                 💡 마크다운 가져오기(Import) 약속 양식 보기
               </span>
-              {showHelp ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              {showHelp ? <ChevronUp className="w-4.5 h-4.5 text-slate-400" /> : <ChevronDown className="w-4.5 h-4.5 text-slate-400" />}
             </button>
 
             {showHelp && (
-              <div className="px-4 pb-4 pt-4 border-t border-slate-100 space-y-4 text-xs text-slate-500 font-semibold leading-relaxed p-4 bg-white animate-in slide-in-from-top-2 duration-200">
+              <div className="px-4.5 pb-5 pt-4 border-t border-slate-100 space-y-4 text-xs text-slate-500 font-semibold leading-relaxed bg-white animate-in slide-in-from-top-2 duration-200 p-4">
                 <div className="space-y-1">
-                  <p className="font-bold text-slate-800 text-sm">
+                  <p className="font-extrabold text-slate-800 text-sm">
                     📋 통합 백업 데이터 구성 예시
                   </p>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-400 font-bold">
                     아래는 8종 운동 전체의 계획/완료 양식이 포함된 전체 백업 파일 내용입니다. 오른쪽의 <strong>전체 예시 복사</strong> 버튼을 누르면 한 번에 클립보드로 복사됩니다!
                   </p>
                 </div>
 
-                {/* Unified Code Preview Block with Copy Button */}
                 <div className="relative border border-slate-200 rounded-3xl bg-slate-900 overflow-hidden shadow-md">
                   <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800 border-b border-slate-700">
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono">
+                    <span className="text-[10px] font-black text-slate-450 uppercase tracking-widest font-mono">
                       FULL WORKOUT BACKUP EXAMPLE (JOS v1 Spec)
                     </span>
                     <button
@@ -694,10 +691,12 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
       </section>
 
       {/* 2. Selective Data Export Section */}
-      <section className="retro-card p-6 sm:p-8 space-y-8">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <Download className="w-6 h-6 text-slate-800" />
-          <h2 className="text-xl font-bold text-slate-900 tracking-wide">데이터 마크다운 내보내기 (Export)</h2>
+      <section className="retro-card p-6 sm:p-8 space-y-8 bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-5">
+          <span className="p-2 rounded-2xl bg-slate-50 border border-slate-100 text-slate-850 flex items-center justify-center">
+            <Download className="w-5 h-5" />
+          </span>
+          <h2 className="text-xl font-extrabold text-slate-950 tracking-tight">데이터 마크다운 내보내기 (Export)</h2>
         </div>
 
         <div className="space-y-6">
@@ -709,22 +708,17 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-slate-500" />
+                <Calendar className="w-4 h-4 text-slate-400" />
                 1. 기간 필터 선택
               </h3>
               
-              {/* Expand / Collapse Toggle Button */}
               <button
                 type="button"
                 onClick={() => setIsPeriodExportOpen(!isPeriodExportOpen)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
               >
                 <span>현재 선택: <strong>{isAllMonths ? '전체 기간' : `${selectedMonths.length}개 월 선택됨`}</strong></span>
-                {isPeriodExportOpen ? (
-                  <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
-                ) : (
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-                )}
+                {isPeriodExportOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
             </div>
             
@@ -733,7 +727,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                 <button
                   type="button"
                   onClick={handleToggleAllMonths}
-                  className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                  className={`px-4.5 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
                     isAllMonths
                       ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
                       : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
@@ -753,7 +747,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                         key={m}
                         type="button"
                         onClick={() => handleToggleMonth(m)}
-                        className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                        className={`px-4.5 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
                           isChecked
                             ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
                             : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
@@ -773,22 +767,17 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
           <div className="space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-slate-500" />
+                <Activity className="w-4 h-4 text-slate-400" />
                 2. 운동 종류 필터 선택
               </h3>
               
-              {/* Expand / Collapse Toggle Button */}
               <button
                 type="button"
                 onClick={() => setIsTypeExportOpen(!isTypeExportOpen)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
               >
                 <span>현재 선택: <strong>{isAllTypes ? '전체 운동' : `${selectedTypes.length}개 종류 선택됨`}</strong></span>
-                {isTypeExportOpen ? (
-                  <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
-                ) : (
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
-                )}
+                {isTypeExportOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
               </button>
             </div>
             
@@ -797,7 +786,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                 <button
                   type="button"
                   onClick={handleToggleAllTypes}
-                  className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                  className={`px-4.5 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
                     isAllTypes
                       ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
                       : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
@@ -814,9 +803,9 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                       key={t.id}
                       type="button"
                       onClick={() => handleToggleType(t.id)}
-                      className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                      className={`px-4.5 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
                         isChecked
-                          ? `${t.color} border-2 shadow-sm scale-102`
+                          ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
                           : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
                       }`}
                     >
@@ -829,48 +818,19 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             )}
           </div>
 
-          {/* Export Action trigger */}
-          <div className="pt-4 border-t border-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="text-xs font-bold text-slate-400 space-y-0.5">
-              <p>📍 현재 선택 필터 요약</p>
-              <p className="text-slate-600">
-                기간: {isAllMonths ? '전체' : selectedMonths.map(m => formatMonthLabel(m)).join(', ')} | 운동: {isAllTypes ? '전체' : selectedTypes.map(tId => WORKOUT_TYPES.find(w => w.id === tId)?.label.split(' ')[1] || tId).join(', ')}
-              </p>
-            </div>
-            
+          {/* Export Action Trigger */}
+          <div className="pt-6 border-t border-slate-100 flex justify-end">
             <button
               onClick={handleExportMarkdown}
-              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-7 py-3.5 rounded-2xl font-bold transition-all shadow-sm hover:scale-102 active:scale-98 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer text-sm"
             >
-              <Download className="w-5 h-5" />
+              <Download className="w-4.5 h-4.5" />
               마크다운 파일 다운로드
             </button>
           </div>
         </div>
       </section>
 
-      {/* 3. Session Management Section */}
-      <section className="retro-card p-6 sm:p-8 space-y-6">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <ShieldAlert className="w-6 h-6 text-red-500" />
-          <h2 className="text-xl font-bold text-slate-900 tracking-wide">세션 관리 (Account)</h2>
-        </div>
-
-        <div className="space-y-4">
-          <p className="text-sm text-slate-500 font-semibold">
-            Supabase 보안 인증 세션을 즉시 파기하고 대시보드와 설정 화면에서 안전하게 로그아웃합니다.
-          </p>
-          
-          <form action={logout} className="pt-2">
-            <button
-              type="submit"
-              className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 hover:border-red-200 px-6 py-3 rounded-2xl font-bold transition-all active:scale-97 cursor-pointer"
-            >
-              로그아웃 (Logout)
-            </button>
-          </form>
-        </div>
-      </section>
     </div>
   )
 }
