@@ -36,12 +36,20 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
   const [pasteText, setPasteText] = useState('')
   const [dragActive, setDragActive] = useState(false)
   const [importing, setImporting] = useState(false)
-  const [importResult, setImportResult] = useState<{
-    success: boolean
-    totalParsed: number
-    upsertedCount: number
-    errors: string[]
+  
+  // --- Preview & Commit States ---
+  const [previewStats, setPreviewStats] = useState<{
+    totalCount: number
+    validCount: number
+    warningCount: number
+    invalidCount: number
   } | null>(null)
+  const [previewBlocks, setPreviewBlocks] = useState<any[] | null>(null)
+  const [selectedBlockIndexes, setSelectedBlockIndexes] = useState<number[]>([])
+  const [isCommitting, setIsCommitting] = useState(false)
+  const [commitSuccessCount, setCommitSuccessCount] = useState<number | null>(null)
+  const [commitError, setCommitError] = useState<string[] | null>(null)
+
   const [showHelp, setShowHelp] = useState(false)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -118,10 +126,14 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
       return
     }
     setImporting(true)
-    setImportResult(null)
+    setPreviewStats(null)
+    setPreviewBlocks(null)
+    setSelectedBlockIndexes([])
+    setCommitSuccessCount(null)
+    setCommitError(null)
 
     try {
-      const res = await fetch('/api/import/markdown', {
+      const res = await fetch('/api/import/markdown/preview', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,27 +142,65 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
       })
 
       const data = await res.json()
-      
-      setImportResult({
-        success: data.success ?? false,
-        totalParsed: data.totalParsed ?? 0,
-        upsertedCount: data.upsertedCount ?? 0,
-        errors: data.errors ?? [],
-      })
-      
-      if (data.success && data.upsertedCount > 0) {
-        // Clear pasted text on successful import
-        setPasteText('')
+      if (res.ok && data.success) {
+        setPreviewStats(data.stats)
+        setPreviewBlocks(data.blocks)
+        
+        // Auto-select valid and warning blocks by default
+        const initialSelected = data.blocks
+          .filter((b: any) => b.type === 'valid' || b.type === 'warning')
+          .map((b: any) => b.blockIndex)
+        setSelectedBlockIndexes(initialSelected)
+      } else {
+        alert(data.message || '마크다운 분석 도중 오류가 발생했습니다.')
       }
     } catch (e) {
-      setImportResult({
-        success: false,
-        totalParsed: 0,
-        upsertedCount: 0,
-        errors: ['서버와 통신하는 중 시스템 네트워크 오류가 발생했습니다.'],
-      })
+      alert('서버와 통신하는 중 네트워크 오류가 발생했습니다.')
     } finally {
       setImporting(false)
+    }
+  }
+
+  const handleCommit = async () => {
+    if (!previewBlocks) return
+
+    const workoutsToSave = previewBlocks
+      .filter(b => selectedBlockIndexes.includes(b.blockIndex))
+      .map(b => b.workout)
+
+    if (workoutsToSave.length === 0) {
+      alert('저장할 운동 기록이 선택되지 않았습니다.')
+      return
+    }
+
+    setIsCommitting(true)
+    setCommitError(null)
+    setCommitSuccessCount(null)
+
+    try {
+      const res = await fetch('/api/import/markdown/commit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ workouts: workoutsToSave }),
+      })
+
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setCommitSuccessCount(data.count)
+        // Clear preview states on successful storage
+        setPreviewStats(null)
+        setPreviewBlocks(null)
+        setSelectedBlockIndexes([])
+        setPasteText('')
+      } else {
+        setCommitError(data.errors || [data.message || '데이터베이스 저장 중 오류가 발생했습니다.'])
+      }
+    } catch (e) {
+      setCommitError(['저장 처리하는 중 네트워크 오류가 발생했습니다.'])
+    } finally {
+      setIsCommitting(false)
     }
   }
 
@@ -339,14 +389,21 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
 
         <div className="space-y-6">
           <p className="text-sm text-slate-500 font-semibold leading-relaxed">
-            백업해두었거나 수동으로 작성한 마크다운 파일(`.md`) 또는 텍스트를 불러와 운동 기록을 복원합니다. 동일한 날짜와 운동 종류가 이미 존재하면 새 내용으로 안전하게 **덮어쓰기(Upsert)**합니다.
+            백업해두었거나 수동으로 작성한 마크다운 파일(`.md`) 또는 텍스트를 불러와 운동 기록을 복원합니다. 동일한 날짜와 운동 종류의 기록이 이미 존재하더라도 덮어쓰지 않고 <strong>신규 기록으로 각각 안전하게 추가(Insert)</strong>됩니다.
           </p>
 
           {/* Import Tabs */}
           <div className="flex border-b border-slate-100 gap-6">
             <button
               type="button"
-              onClick={() => { setImportTab('file'); setImportResult(null); }}
+              onClick={() => { 
+                setImportTab('file'); 
+                setPreviewStats(null);
+                setPreviewBlocks(null);
+                setSelectedBlockIndexes([]);
+                setCommitSuccessCount(null);
+                setCommitError(null);
+              }}
               className={`pb-2.5 text-sm font-extrabold tracking-wide transition-all border-b-2 cursor-pointer ${
                 importTab === 'file'
                   ? 'border-slate-900 text-slate-900'
@@ -357,7 +414,14 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             </button>
             <button
               type="button"
-              onClick={() => { setImportTab('paste'); setImportResult(null); }}
+              onClick={() => { 
+                setImportTab('paste'); 
+                setPreviewStats(null);
+                setPreviewBlocks(null);
+                setSelectedBlockIndexes([]);
+                setCommitSuccessCount(null);
+                setCommitError(null);
+              }}
               className={`pb-2.5 text-sm font-extrabold tracking-wide transition-all border-b-2 cursor-pointer ${
                 importTab === 'paste'
                   ? 'border-slate-900 text-slate-900'
@@ -443,55 +507,226 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
           {importing && importTab === 'file' && (
             <div className="flex items-center justify-center gap-2 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 font-bold text-sm animate-pulse">
               <Loader2 className="w-5 h-5 animate-spin text-slate-800" />
-              파일 분석 및 데이터 복원 진행 중...
+              파일 분석 및 데이터 프리뷰 생성 중...
             </div>
           )}
 
-          {/* Import Result Notification Banners */}
-          {importResult && (
-            <div className="space-y-3 animate-in fade-in duration-300">
-              {importResult.upsertedCount > 0 ? (
-                <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-100 text-emerald-800 flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 mt-0.5 shrink-0 text-emerald-600" />
-                  <div className="space-y-1">
-                    <h4 className="font-extrabold text-sm">성공적으로 복원되었습니다!</h4>
-                    <p className="text-xs font-semibold text-emerald-700 leading-relaxed">
-                      총 {importResult.totalParsed}개의 운동 정보 중 **{importResult.upsertedCount}개**의 기록이 캘린더 데이터베이스에 안전하게 복원 및 동기화(Upsert)되었습니다.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                !importing && importResult.errors.length === 0 && (
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-slate-600 flex items-start gap-3">
-                    <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-slate-500" />
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-sm">가져올 신규 기록이 없습니다.</h4>
-                      <p className="text-xs font-semibold text-slate-500">
-                        파일 형식이 알맞게 맞추어져 있는지 아래 양식 가이드를 다시 확인해 보세요.
-                      </p>
-                    </div>
-                  </div>
-                )
-              )}
-
-              {importResult.errors.length > 0 && (
-                <div className="p-4 rounded-2xl bg-rose-50/80 border border-rose-100 text-rose-800 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-rose-600" />
-                  <div className="space-y-1.5 w-full">
-                    <h4 className="font-extrabold text-sm">일부 데이터를 가져오지 못했습니다.</h4>
-                    <p className="text-xs font-semibold text-rose-700">
-                      파싱 또는 데이터 벨리데이션 검사 중 오류가 발견되었습니다. 다음 {importResult.errors.length}건은 무시되었습니다:
-                    </p>
-                    <div className="bg-white/80 border border-rose-100 rounded-xl p-3 text-[11px] font-mono leading-relaxed space-y-1 max-h-[140px] overflow-y-auto w-full text-rose-800">
-                      {importResult.errors.map((err, idx) => (
-                        <div key={idx}>⚠️ {err}</div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+          {/* Commit Success Notification Banner */}
+          {commitSuccessCount !== null && (
+            <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-100 text-emerald-900 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <CheckCircle className="w-6 h-6 mt-0.5 shrink-0 text-emerald-600" />
+              <div className="space-y-1">
+                <h4 className="font-extrabold text-base">🎉 데이터 저장 성공!</h4>
+                <p className="text-sm font-semibold text-emerald-700 leading-relaxed">
+                  선택하신 **총 {commitSuccessCount}개**의 운동 기록이 JOS 데이터베이스에 성공적으로 추가(Insert)되었습니다. 캘린더에서 바로 확인할 수 있습니다.
+                </p>
+              </div>
             </div>
           )}
+
+          {/* Commit Errors Notification Banner */}
+          {commitError && commitError.length > 0 && (
+            <div className="p-5 rounded-3xl bg-rose-50 border border-rose-100 text-rose-900 flex items-start gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+              <AlertCircle className="w-6 h-6 mt-0.5 shrink-0 text-rose-600" />
+              <div className="space-y-2 w-full">
+                <h4 className="font-extrabold text-base">⚠️ 데이터 저장 실패</h4>
+                <p className="text-sm font-semibold text-rose-700">
+                  최종 저장 도중 다음과 같은 유효성 검사 에러가 발생하여 처리가 차단되었습니다:
+                </p>
+                <div className="bg-white/80 border border-rose-100 rounded-2xl p-4 text-xs font-mono leading-relaxed space-y-1.5 max-h-[150px] overflow-y-auto w-full text-rose-800">
+                  {commitError.map((err, idx) => (
+                    <div key={idx}>• {err}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Import Preview Dashboard */}
+          {previewBlocks && previewStats && (
+            <div className="space-y-6 bg-slate-50/50 border border-slate-100 rounded-3xl p-5 sm:p-6 animate-in fade-in duration-300">
+              {/* Summary Stats Header */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                    🔎 마크다운 가져오기 프리뷰 (Preview)
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 bg-slate-200 text-slate-700 font-extrabold rounded-full uppercase">
+                    JOS v1 SPEC
+                  </span>
+                </div>
+                <p className="text-xs font-semibold text-slate-500 leading-relaxed">
+                  가져온 마크다운 파일 내의 운동 블록별 상태 분석 결과입니다. <strong>Valid(정상)</strong> 및 체크된 <strong>Warning(경고)</strong> 블록만 데이터베이스에 신규 추가(Insert)됩니다.
+                </p>
+
+                {/* Stats Grid */}
+                <div className="grid grid-cols-4 gap-2.5 pt-2 text-center">
+                  <div className="p-3 bg-white border border-slate-100 rounded-2xl shadow-sm">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">총 블록</p>
+                    <p className="text-xl font-black text-slate-800 mt-1">{previewStats.totalCount}</p>
+                  </div>
+                  <div className="p-3 bg-white border border-emerald-100 rounded-2xl shadow-sm">
+                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-wider">저장 가능</p>
+                    <p className="text-xl font-black text-emerald-600 mt-1">{previewStats.validCount}</p>
+                  </div>
+                  <div className="p-3 bg-white border border-amber-100 rounded-2xl shadow-sm">
+                    <p className="text-[10px] font-black text-amber-500 uppercase tracking-wider">경고 있음</p>
+                    <p className="text-xl font-black text-amber-600 mt-1">{previewStats.warningCount}</p>
+                  </div>
+                  <div className="p-3 bg-white border border-rose-100 rounded-2xl shadow-sm">
+                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-wider">저장 불가</p>
+                    <p className="text-xl font-black text-rose-600 mt-1">{previewStats.invalidCount}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Scrollable Preview Blocks List */}
+              <div className="max-h-[360px] overflow-y-auto border border-slate-100 rounded-2xl p-4 bg-white/60 space-y-3.5 divide-y divide-slate-100/50">
+                {previewBlocks.map((b) => {
+                  const isValid = b.type === 'valid'
+                  const isWarning = b.type === 'warning'
+                  const isInvalid = b.type === 'invalid'
+                  
+                  const isChecked = selectedBlockIndexes.includes(b.blockIndex)
+
+                  return (
+                    <div 
+                      key={b.blockIndex} 
+                      className={`pt-3.5 first:pt-0 flex flex-col gap-3 rounded-2xl p-3 border-l-4 transition-all ${
+                        isValid ? 'border-l-emerald-500 bg-emerald-50/10 border border-slate-100' :
+                        isWarning ? 'border-l-amber-500 bg-amber-50/10 border border-slate-100' :
+                        'border-l-rose-500 bg-rose-50/10 border border-slate-100'
+                      }`}
+                    >
+                      {/* Block Header Area */}
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="space-y-0.5">
+                          <h4 className="font-extrabold text-sm text-slate-800 tracking-wide font-mono">
+                            {b.workout ? `## ${b.workout.workout_date} ${b.workout.type}` : `## 라인 ${b.lineNum} 블록`}
+                          </h4>
+                          {b.workout && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className={`text-[9px] px-2 py-0.5 rounded font-extrabold uppercase ${
+                                b.workout.status === 'completed' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'
+                              }`}>
+                                {b.workout.status}
+                              </span>
+                              {b.workout.running_distance_km && (
+                                <span className="text-[9px] px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded font-bold font-mono">
+                                  🏃 {b.workout.running_distance_km}km
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Controls (Checkbox for Valid/Warning, cross for Invalid) */}
+                        <div className="shrink-0 pt-0.5">
+                          {isInvalid ? (
+                            <span className="text-[10px] font-black text-rose-500 bg-rose-100/50 px-2.5 py-1 rounded-full flex items-center gap-1">
+                              <AlertCircle className="w-3.5 h-3.5" /> 저장 불가
+                            </span>
+                          ) : (
+                            <label className="flex items-center gap-1.5 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setSelectedBlockIndexes([...selectedBlockIndexes, b.blockIndex])
+                                  } else {
+                                    setSelectedBlockIndexes(selectedBlockIndexes.filter(idx => idx !== b.blockIndex))
+                                  }
+                                }}
+                                className="w-4 h-4 text-slate-900 focus:ring-slate-900 border-slate-300 rounded cursor-pointer"
+                              />
+                              <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                                isChecked 
+                                  ? isValid ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                                  : 'bg-slate-100 text-slate-400'
+                              }`}>
+                                {isChecked ? '저장 예정' : '저장 안 함'}
+                              </span>
+                            </label>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Errors and Warnings lists */}
+                      {b.errors.length > 0 && (
+                        <div className="bg-rose-50/50 border border-rose-100 rounded-xl p-3 text-[11px] font-semibold text-rose-700 space-y-1">
+                          {b.errors.map((err: string, idx: number) => (
+                            <div key={idx} className="flex items-start gap-1">
+                              <span className="shrink-0 mt-0.5 text-rose-600">❌</span>
+                              <span>{err}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {b.warnings.length > 0 && (
+                        <div className="bg-amber-50/50 border border-amber-100 rounded-xl p-3 text-[11px] font-semibold text-amber-700 space-y-1">
+                          {b.warnings.map((warn: string, idx: number) => (
+                            <div key={idx} className="flex items-start gap-1">
+                              <span className="shrink-0 mt-0.5 text-amber-600">⚠️</span>
+                              <span>{warn}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Workout markdown snippet preview */}
+                      {b.workout && b.workout.markdown && (
+                        <div className="bg-slate-50/50 border border-slate-100 rounded-xl p-3 text-xs leading-relaxed font-semibold text-slate-500 whitespace-pre-wrap max-h-[80px] overflow-y-auto font-mono">
+                          {b.workout.markdown}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Commit Action controls */}
+              <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p className="text-xs font-bold text-slate-400 leading-normal">
+                  📍 선택 요약: 저장 대상 **총 {selectedBlockIndexes.length}건**의 운동 기록
+                </p>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPreviewBlocks(null);
+                      setPreviewStats(null);
+                      setSelectedBlockIndexes([]);
+                    }}
+                    className="px-5 py-3 rounded-2xl bg-white border border-slate-200 text-slate-600 hover:text-slate-900 font-bold text-sm transition-colors cursor-pointer"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCommit}
+                    disabled={isCommitting || selectedBlockIndexes.length === 0}
+                    className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 px-6 py-3.5 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed text-sm"
+                  >
+                    {isCommitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        데이터베이스 저장 중...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4.h-4" />
+                        데이터베이스 최종 저장
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
 
           {/* Form Help / Formatting Rules Accordion */}
           <div className="border border-slate-100 rounded-2xl overflow-hidden transition-all bg-slate-50/40">
