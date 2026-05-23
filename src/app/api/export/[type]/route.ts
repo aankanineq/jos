@@ -72,7 +72,7 @@ export async function GET(
       const details: string[] = []
       
       if (w.status !== 'completed') {
-        const statusMap = { planned: '예정됨', skipped: '건너뜀', completed: '완료됨' }
+        const statusMap = { planned: '예정됨', completed: '완료됨' }
         details.push(`**상태**: ${statusMap[w.status] || w.status}`)
       }
       

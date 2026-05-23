@@ -36,11 +36,30 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
     
     const formData = new FormData(e.currentTarget)
     const markdownVal = (formData.get('markdown') as string || '').trim()
+    const status = formData.get('status') as WorkoutStatus
     
-    if (type !== 'Rest' && !markdownVal) {
-      setErrorMsg('운동 기록(Markdown)을 입력해주세요. (빈 기록은 저장할 수 없습니다.)')
+    // 1. Validation for Pull/Push/Leg/Full + completed: markdown (memo) required
+    const strengthTypes = ['Pull', 'Push', 'Leg', 'Full']
+    if (strengthTypes.includes(type) && status === 'completed' && !markdownVal) {
+      setErrorMsg(`${type} 완료 기록은 세부 운동 기록(메모)이 필수입니다.`)
       setIsSubmitting(false)
       return
+    }
+    
+    // 2. Validation for Running + completed: distance and duration required
+    if (type === 'Running' && status === 'completed') {
+      const distance = formData.get('running_distance_km')
+      const duration = Number(runningHour) * 3600 + Number(runningMin) * 60 + Number(runningSec)
+      if (!distance || Number(distance) <= 0) {
+        setErrorMsg('완료된 러닝 기록은 거리(km) 입력이 필수이며 0보다 커야 합니다.')
+        setIsSubmitting(false)
+        return
+      }
+      if (!duration || duration <= 0) {
+        setErrorMsg('완료된 러닝 기록은 전체 시간(시/분/초) 입력이 필수이며 0보다 커야 합니다.')
+        setIsSubmitting(false)
+        return
+      }
     }
     
     try {
@@ -172,7 +191,6 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
         <textarea
           name="markdown"
           rows={8}
-          required={type !== 'Rest'}
           defaultValue={initialData?.markdown || ''}
           placeholder={`## 풀업\nBW 10 10 10\n\n## 시티드로우\n50kg 12 10 10`}
           className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 font-mono text-sm leading-relaxed transition-all shadow-sm"

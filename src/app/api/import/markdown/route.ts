@@ -211,20 +211,29 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    // 3. Validate Running specific conditions
+    // 3. Validate Workout Specific Validation Rules
     if (pw.type === 'Running') {
       if (pw.invalidDurationFormat) {
         errors.push(`라인 ${pw.lineNum}: 러닝 전체 시간(duration) 형식이 올바르지 않습니다. 생략 없이 반드시 H:MM:SS 형식이어야 합니다. (입력값: "${pw.invalidDurationFormat}")`)
         continue
       }
-      
-      // Require both distance and duration if one is supplied
-      if (pw.running_distance_km && !pw.running_duration_sec) {
-        errors.push(`라인 ${pw.lineNum}: 러닝 거리는 있으나 시간(duration: H:MM:SS)이 누락되었습니다.`)
-        continue
+
+      if (pw.status === 'completed') {
+        // completed running: distance required, duration required
+        if (pw.running_distance_km === null || pw.running_distance_km <= 0) {
+          errors.push(`라인 ${pw.lineNum}: 완료된 러닝(completed Running)은 거리(running_distance_km)가 필수이며 0보다 커야 합니다.`)
+          continue
+        }
+        if (pw.running_duration_sec === null || pw.running_duration_sec <= 0) {
+          errors.push(`라인 ${pw.lineNum}: 완료된 러닝(completed Running)은 전체 시간(duration)이 필수이며 0보다 커야 합니다.`)
+          continue
+        }
       }
-      if (pw.running_duration_sec && !pw.running_distance_km) {
-        errors.push(`라인 ${pw.lineNum}: 러닝 시간은 있으나 거리(running_distance_km)가 누락되었습니다.`)
+      // planned running: distance optional, duration optional
+    } else {
+      // Non-running workout: all running related fields are forbidden!
+      if (pw.running_distance_km !== null || pw.running_duration_sec !== null || (pw.running_intensity !== null && pw.running_intensity !== 'unknown')) {
+        errors.push(`라인 ${pw.lineNum}: 러닝이 아닌 운동(${pw.type})에는 러닝 관련 필드(거리, 시간, 강도 등)를 기입할 수 없습니다.`)
         continue
       }
     }
@@ -235,8 +244,17 @@ export async function POST(request: NextRequest) {
       continue
     }
 
-    // 5. Validate Running Intensity
-    if (pw.running_intensity && !validIntensities.includes(pw.running_intensity)) {
+    // 5. Validate Memo (Markdown) Requirements
+    const strengthTypes = ['Pull', 'Push', 'Leg', 'Full']
+    if (strengthTypes.includes(pw.type) && pw.status === 'completed') {
+      if (!pw.markdown || pw.markdown.trim().length === 0) {
+        errors.push(`라인 ${pw.lineNum}: 완료된 ${pw.type} 운동은 세부 운동 기록(메모)이 필수입니다.`)
+        continue
+      }
+    }
+
+    // 6. Validate Running Intensity
+    if (pw.type === 'Running' && pw.running_intensity && !validIntensities.includes(pw.running_intensity)) {
       errors.push(`라인 ${pw.lineNum}: 알 수 없는 러닝 강도입니다. (${pw.running_intensity})`)
       continue
     }
