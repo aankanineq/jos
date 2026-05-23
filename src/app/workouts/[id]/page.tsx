@@ -51,12 +51,12 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
                   <div>
                     <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">{workout.type}</h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider ${
-                        workout.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                        workout.status === 'planned' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
-                        'bg-slate-100 text-slate-500 border border-slate-200'
+                      <span className={`text-[10px] px-2 py-0.5 rounded-lg font-black uppercase tracking-wider ${
+                        workout.status === 'completed' 
+                          ? 'bg-emerald-600 text-white border border-emerald-600 shadow-sm shadow-emerald-100/50' 
+                          : 'bg-slate-50 text-slate-400 border border-dashed border-slate-350 font-extrabold'
                       }`}>
-                        {workout.status}
+                        {workout.status === 'completed' ? '완료' : '계획'}
                       </span>
                     </div>
                   </div>

@@ -560,18 +560,18 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                             ? 'bg-emerald-600 text-white border border-emerald-600 shadow-sm shadow-emerald-100/50' 
                             : 'bg-slate-50 text-slate-400 border border-dashed border-slate-350 font-extrabold'
                         }`}>
-                          {w.status}
+                          {w.status === 'completed' ? '완료' : '계획'}
                         </span>
                       </div>
 
                       {w.type === 'Running' && w.running_distance_km ? (
                         <p className="text-sm font-semibold text-slate-500">
-                          🏃 {w.running_distance_km}km
+                          {w.running_distance_km}km
                           {w.running_duration_sec && (() => {
                             const h = Math.floor(w.running_duration_sec / 3600)
                             const m = Math.floor((w.running_duration_sec % 3600) / 60).toString().padStart(2, '0')
                             const s = (w.running_duration_sec % 60).toString().padStart(2, '0')
-                            return ` • ⏱️ ${h}:${m}:${s}`
+                            return ` • ${h}:${m}:${s}`
                           })()}
                         </p>
                       ) : (
