@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createWorkout, updateWorkout, deleteWorkout } from '@/lib/workouts/repository'
+import { createWorkout, updateWorkout, deleteWorkout, deleteWorkouts } from '@/lib/workouts/repository'
 import { CreateWorkoutPayload, UpdateWorkoutPayload, WorkoutType, WorkoutStatus } from '@/lib/types'
 import { validateWorkoutPayload, calculateRunningPace } from '@/lib/workouts/validation'
 
@@ -75,4 +75,13 @@ export async function deleteWorkoutAction(id: string, date: string) {
   revalidatePath(`/workouts/${date}`)
   
   redirect('/workouts')
+}
+
+export async function deleteWorkoutsBulkAction(ids: string[]) {
+  if (ids.length === 0) return
+  await deleteWorkouts(ids)
+  
+  revalidatePath('/workouts')
+  revalidatePath('/calendar')
+  revalidatePath('/')
 }

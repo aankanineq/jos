@@ -2,13 +2,15 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
 import { 
   PlusCircle, ChevronRight, Dumbbell, Calendar, Activity, 
-  Search, Flame, Clock, TrendingUp, X, Sparkles, AlertCircle 
+  Search, Flame, Clock, TrendingUp, X, Sparkles, AlertCircle, Trash2 
 } from 'lucide-react'
 import { WorkoutEntry, WorkoutType } from '@/lib/types'
 import WorkoutArtwork from '@/components/WorkoutArtwork'
+import { deleteWorkoutsBulkAction } from '@/app/workouts/actions'
 
 interface WorkoutsListClientProps {
   initialWorkouts: WorkoutEntry[]
@@ -26,9 +28,15 @@ const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: stri
 ]
 
 export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClientProps) {
+  const router = useRouter()
   const [selectedMonth, setSelectedMonth] = useState<string>('all')
   const [selectedType, setSelectedType] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+
+  // Multi-delete states
+  const [isDeleteMode, setIsDeleteMode] = useState(false)
+  const [selectedDeleteIds, setSelectedDeleteIds] = useState<string[]>([])
+  const [deleting, setDeleting] = useState(false)
 
   // 1. Extract all unique months in YYYY-MM format from workouts
   const uniqueMonths = useMemo(() => {
@@ -134,6 +142,34 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
     setSearchQuery('')
   }
 
+  const toggleDeleteSelection = (id: string) => {
+    if (selectedDeleteIds.includes(id)) {
+      setSelectedDeleteIds(selectedDeleteIds.filter((item) => item !== id))
+    } else {
+      setSelectedDeleteIds([...selectedDeleteIds, id])
+    }
+  }
+
+  const handleBulkDelete = async () => {
+    if (selectedDeleteIds.length === 0) return
+    
+    const confirmMessage = `선택하신 ${selectedDeleteIds.length}개의 운동 기록을 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`
+    if (!window.confirm(confirmMessage)) return
+
+    setDeleting(true)
+    try {
+      await deleteWorkoutsBulkAction(selectedDeleteIds)
+      setSelectedDeleteIds([])
+      setIsDeleteMode(false)
+      router.refresh()
+    } catch (e) {
+      alert('일괄 삭제 작업 도중 에러가 발생했습니다.')
+      console.error(e)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   return (
     <div className="space-y-8 animate-in fade-in pb-24 max-w-4xl mx-auto px-4 md:px-0">
       
@@ -148,14 +184,61 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
             모든 운동 기록을 필터링 및 검색을 통해 편리하게 관리하세요.
           </p>
         </div>
-        <Link
-          href="/workouts/new"
-          className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-102 active:scale-98 cursor-pointer"
-        >
-          <PlusCircle className="w-5 h-5" />
-          새 기록 추가
-        </Link>
+        
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
+          {/* Select & Delete Toggle Button */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsDeleteMode(!isDeleteMode)
+              setSelectedDeleteIds([])
+            }}
+            className={`inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-102 active:scale-98 cursor-pointer text-sm border ${
+              isDeleteMode 
+                ? 'bg-rose-50 border-rose-200 text-rose-600 hover:bg-rose-100'
+                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-350 hover:text-slate-800'
+            }`}
+          >
+            <Trash2 className="w-4.5 h-4.5" />
+            {isDeleteMode ? '선택 취소' : '기록 선택 삭제'}
+          </button>
+
+          {!isDeleteMode && (
+            <Link
+              href="/workouts/new"
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-2xl font-bold transition-all duration-300 shadow-sm hover:scale-102 active:scale-98 cursor-pointer text-sm"
+            >
+              <PlusCircle className="w-5 h-5" />
+              새 기록 추가
+            </Link>
+          )}
+        </div>
       </header>
+
+      {/* Bulk Delete Bar */}
+      {isDeleteMode && selectedDeleteIds.length > 0 && (
+        <div className="retro-card p-4 bg-rose-50 border border-rose-100 flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-bottom-5 duration-300">
+          <p className="text-sm font-bold text-rose-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            선택한 **{selectedDeleteIds.length}개**의 운동 기록을 완전히 삭제하시겠습니까?
+          </p>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => setSelectedDeleteIds([])}
+              className="px-4 py-2 rounded-xl bg-white border border-rose-200 text-rose-600 font-bold text-xs hover:bg-rose-100 active:scale-97 cursor-pointer"
+            >
+              선택 해제
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={deleting}
+              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-rose-300 text-white font-bold text-xs shadow-sm active:scale-97 cursor-pointer"
+            >
+              {deleting ? '지우는 중...' : '선택 삭제 실행'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Filter and Search Panel */}
       <div className="retro-card p-6 sm:p-7 bg-white border border-slate-100 space-y-6">
@@ -356,62 +439,98 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
         </div>
       ) : (
         <div className="retro-card overflow-hidden bg-white border border-slate-100">
-          <div className="divide-y divide-slate-100">
-            {filteredWorkouts.map((w) => (
-              <Link
-                key={w.id}
-                href={`/workouts/${w.workout_date}`}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 hover:bg-slate-50/50 transition-all duration-300 group gap-4"
-              >
-                <div className="flex items-center gap-4">
-                  {/* Smartwatch Face Icon */}
-                  <WorkoutArtwork type={w.type} status={w.status} size="sm" />
-                  
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2.5 mb-1">
-                      <h4 className="font-extrabold text-slate-900 text-lg tracking-wide group-hover:text-slate-800 transition-colors">
-                        {w.type}
-                      </h4>
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-extrabold uppercase tracking-wider ${
-                        w.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                        w.status === 'planned' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
-                        'bg-slate-100 text-slate-500 border border-slate-200'
-                      }`}>
-                        {w.status}
-                      </span>
-                    </div>
+          <div className="divide-y divide-slate-100 animate-in fade-in duration-255">
+            {filteredWorkouts.map((w) => {
+              const isSelected = selectedDeleteIds.includes(w.id)
+              
+              return (
+                <Link
+                  key={w.id}
+                  href={`/workouts/${w.workout_date}`}
+                  onClick={(e) => {
+                    if (isDeleteMode) {
+                      e.preventDefault()
+                      toggleDeleteSelection(w.id)
+                    }
+                  }}
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 transition-all duration-300 group gap-4 cursor-pointer ${
+                    isDeleteMode 
+                      ? isSelected 
+                        ? 'bg-rose-50/40 hover:bg-rose-50/60' 
+                        : 'hover:bg-slate-50/40'
+                      : 'hover:bg-slate-50/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Delete Mode Checkbox Container */}
+                    {isDeleteMode && (
+                      <div className="shrink-0 animate-in slide-in-from-left-2 duration-200">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          readOnly
+                          className="w-5 h-5 text-rose-600 focus:ring-rose-500 border-slate-300 rounded cursor-pointer transition-all"
+                        />
+                      </div>
+                    )}
 
-                    {w.type === 'Running' && w.running_distance_km ? (
-                      <p className="text-sm font-semibold text-slate-500">
-                        🏃 {w.running_distance_km}km
-                        {w.running_duration_sec && (() => {
-                          const h = Math.floor(w.running_duration_sec / 3600)
-                          const m = Math.floor((w.running_duration_sec % 3600) / 60).toString().padStart(2, '0')
-                          const s = (w.running_duration_sec % 60).toString().padStart(2, '0')
-                          return ` • ⏱️ ${h}:${m}:${s}`
-                        })()}
+                    {/* Smartwatch Face Icon */}
+                    <WorkoutArtwork type={w.type} status={w.status} size="sm" />
+                    
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2.5 mb-1">
+                        <h4 className="font-extrabold text-slate-900 text-lg tracking-wide group-hover:text-slate-800 transition-colors">
+                          {w.type}
+                        </h4>
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-extrabold uppercase tracking-wider ${
+                          w.status === 'completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
+                          w.status === 'planned' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
+                          'bg-slate-100 text-slate-500 border border-slate-200'
+                        }`}>
+                          {w.status}
+                        </span>
+                      </div>
+
+                      {w.type === 'Running' && w.running_distance_km ? (
+                        <p className="text-sm font-semibold text-slate-500">
+                          🏃 {w.running_distance_km}km
+                          {w.running_duration_sec && (() => {
+                            const h = Math.floor(w.running_duration_sec / 3600)
+                            const m = Math.floor((w.running_duration_sec % 3600) / 60).toString().padStart(2, '0')
+                            const s = (w.running_duration_sec % 60).toString().padStart(2, '0')
+                            return ` • ⏱️ ${h}:${m}:${s}`
+                          })()}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-slate-500 line-clamp-1 max-w-md font-semibold">
+                          {w.markdown ? w.markdown.split('\n')[0].replace(/^#+\s/, '') : '상세 기록 없음'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-5 sm:w-auto w-full pl-16 sm:pl-0">
+                    <div className="text-right">
+                      <p className="text-sm font-extrabold text-slate-800">
+                        {format(new Date(w.workout_date), 'MM월 dd일')}
                       </p>
+                      <p className="text-[10px] font-bold text-slate-400 tracking-wider mt-0.5 uppercase">
+                        {format(new Date(w.workout_date), 'EEEE')}
+                      </p>
+                    </div>
+                    {isDeleteMode ? (
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        <div className={`w-3.5 h-3.5 rounded-full border transition-all ${
+                          isSelected ? 'bg-rose-500 border-rose-600 scale-110 shadow-sm' : 'border-slate-350 bg-white'
+                        }`} />
+                      </div>
                     ) : (
-                      <p className="text-sm text-slate-500 line-clamp-1 max-w-md font-semibold">
-                        {w.markdown ? w.markdown.split('\n')[0].replace(/^#+\s/, '') : '상세 기록 없음'}
-                      </p>
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
                     )}
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-5 sm:w-auto w-full pl-16 sm:pl-0">
-                  <div className="text-right">
-                    <p className="text-sm font-extrabold text-slate-800">
-                      {format(new Date(w.workout_date), 'MM월 dd일')}
-                    </p>
-                    <p className="text-[10px] font-bold text-slate-400 tracking-wider mt-0.5 uppercase">
-                      {format(new Date(w.workout_date), 'EEEE')}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                </div>
-              </Link>
-            ))}
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
