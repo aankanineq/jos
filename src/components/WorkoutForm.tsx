@@ -5,6 +5,7 @@ import { WorkoutEntry, WorkoutType, WorkoutStatus } from '@/lib/types'
 import { addWorkoutAction, editWorkoutAction } from '@/app/workouts/actions'
 import { validateWorkoutPayload } from '@/lib/workouts/validation'
 import { format } from 'date-fns'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 interface Props {
   initialData?: WorkoutEntry
@@ -15,6 +16,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
   const [type, setType] = useState<WorkoutType>(initialData?.type || 'Pull')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const initialDuration = initialData?.running_duration_sec || 0
   const [runningHour, setRunningHour] = useState<string>(
@@ -74,7 +76,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
     }
   }
 
-  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other', 'Shoulder, Arm']
+  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Shoulder, Arm', 'Full', 'Running', 'Tennis', 'Other']
   const statuses: WorkoutStatus[] = ['planned', 'completed']
 
   const typeLabels: Record<WorkoutType, string> = {
@@ -118,24 +120,58 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-2 relative">
         <label className="text-sm font-bold text-slate-700 tracking-wide">운동 종류</label>
-        <div className="flex flex-wrap gap-2">
-          {types.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setType(t)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all border ${
-                type === t
-                  ? 'bg-slate-900 text-white border-slate-950 shadow-sm scale-102'
-                  : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-slate-200 hover:text-slate-800'
-              }`}
-            >
-              {typeLabels[t] || t}
-            </button>
-          ))}
-        </div>
+        
+        {/* Dropdown Trigger Button */}
+        <button
+          type="button"
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className="w-full flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-bold shadow-sm cursor-pointer hover:bg-slate-50/30 text-sm"
+        >
+          <span className="flex items-center gap-2">
+            {typeLabels[type] || type}
+          </span>
+          {isDropdownOpen ? (
+            <ChevronUp className="w-5 h-5 text-slate-500" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-slate-500" />
+          )}
+        </button>
+
+        {/* Dropdown Options List */}
+        {isDropdownOpen && (
+          <>
+            {/* Click outside backdrop to close */}
+            <div 
+              className="fixed inset-0 z-40" 
+              onClick={() => setIsDropdownOpen(false)}
+            />
+            <div className="absolute left-0 w-full bg-white border border-slate-200/80 rounded-2xl shadow-xl p-2.5 space-y-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150 mt-1.5 max-h-[280px] overflow-y-auto">
+              {types.map((t) => {
+                const isSelected = type === t
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      setType(t)
+                      setIsDropdownOpen(false)
+                    }}
+                    className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer active:scale-99 ${
+                      isSelected
+                        ? 'bg-slate-900 text-white shadow-sm font-black'
+                        : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    {typeLabels[t] || t}
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
+
         {/* Hidden input to submit the selected type */}
         <input type="hidden" name="type" value={type} />
       </div>
