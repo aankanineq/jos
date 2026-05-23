@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createWorkout, updateWorkout, deleteWorkout } from '@/lib/workouts/repository'
-import { CreateWorkoutPayload, UpdateWorkoutPayload, WorkoutType, WorkoutStatus, RunningIntensity } from '@/lib/types'
+import { CreateWorkoutPayload, UpdateWorkoutPayload, WorkoutType, WorkoutStatus } from '@/lib/types'
 import { validateWorkoutPayload, calculateRunningPace } from '@/lib/workouts/validation'
 
 function formDataToPayload(formData: FormData): CreateWorkoutPayload {
@@ -30,7 +30,6 @@ function formDataToPayload(formData: FormData): CreateWorkoutPayload {
     running_distance_km,
     running_duration_sec,
     running_pace_sec_per_km,
-    running_intensity: isRunning ? ((formData.get('running_intensity') as RunningIntensity) || null) : null,
   }
 
   // Validate the payload using the shared validation library

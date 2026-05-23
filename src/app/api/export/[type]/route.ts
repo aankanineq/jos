@@ -67,56 +67,28 @@ export async function GET(
     mdContent += `*선택한 필터 조건에 해당하는 운동 로그가 존재하지 않습니다.*\n`
   } else {
     workouts.forEach(w => {
-      mdContent += `## 🗓️ [${w.workout_date}] ${w.type}\n`
-      
-      const details: string[] = []
-      
-      if (w.status !== 'completed') {
-        const statusMap = { planned: '예정됨', completed: '완료됨' }
-        details.push(`**상태**: ${statusMap[w.status] || w.status}`)
+      mdContent += `## ${w.workout_date} ${w.type}\n`
+      mdContent += `status: ${w.status}\n`
+      if (w.title) {
+        mdContent += `title: ${w.title}\n`
       }
-      
       if (w.type === 'Running') {
-        const parts: string[] = []
         if (w.running_distance_km) {
-          parts.push(`${w.running_distance_km}km`)
+          mdContent += `running_distance_km: ${w.running_distance_km}\n`
         }
         if (w.running_duration_sec) {
-          const mins = Math.floor(w.running_duration_sec / 60)
-          const secs = w.running_duration_sec % 60
-          parts.push(secs > 0 ? `${mins}분 ${secs}초` : `${mins}분`)
-        }
-        if (w.running_pace_sec_per_km) {
-          const paceMins = Math.floor(w.running_pace_sec_per_km / 60)
-          const paceSecs = w.running_pace_sec_per_km % 60
-          const paceSecsStr = paceSecs.toString().padStart(2, '0')
-          parts.push(`페이스 ${paceMins}'${paceSecsStr}"/km`)
-        }
-        if (w.running_intensity && w.running_intensity !== 'unknown') {
-          const intensityMap = {
-            easy: '조깅/이지런',
-            long: '장거리/롱런',
-            tempo: '템포런',
-            interval: '인터벌',
-            race: '대회 페이스',
-            unknown: '기타'
-          }
-          parts.push(intensityMap[w.running_intensity] || w.running_intensity)
-        }
-        if (parts.length > 0) {
-          details.push(`**러닝 기록**: ${parts.join(' / ')}`)
+          const h = Math.floor(w.running_duration_sec / 3600)
+          const m = Math.floor((w.running_duration_sec % 3600) / 60)
+          const s = w.running_duration_sec % 60
+          const durationStr = `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+          mdContent += `duration: ${durationStr}\n`
         }
       }
-
-      if (details.length > 0) {
-        details.forEach(detail => {
-          mdContent += `- ${detail}\n`
-        })
-        mdContent += `\n`
-      }
-
       if (w.markdown) {
-        mdContent += `${w.markdown}\n`
+        mdContent += `memo: ${w.markdown.replace(/\r?\n/g, ' ')}\n`
+      }
+      if (w.notes) {
+        mdContent += `notes: ${w.notes.replace(/\r?\n/g, ' ')}\n`
       }
       
       mdContent += `\n---\n\n`

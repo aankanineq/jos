@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { WorkoutEntry, WorkoutType, WorkoutStatus, RunningIntensity } from '@/lib/types'
+import { WorkoutEntry, WorkoutType, WorkoutStatus } from '@/lib/types'
 import { addWorkoutAction, editWorkoutAction } from '@/app/workouts/actions'
 import { validateWorkoutPayload } from '@/lib/workouts/validation'
 import { format } from 'date-fns'
@@ -54,7 +54,6 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
       markdown: markdownVal || null,
       running_distance_km,
       running_duration_sec,
-      running_intensity: null,
     })
 
     if (!validationResult.isValid) {
@@ -77,7 +76,6 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
 
   const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other']
   const statuses: WorkoutStatus[] = ['planned', 'completed']
-  const intensities: RunningIntensity[] = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-4 min-[390px]:p-6 sm:p-8 bg-white border border-slate-100">

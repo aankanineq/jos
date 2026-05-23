@@ -1,4 +1,4 @@
-import { WorkoutType, WorkoutStatus, RunningIntensity } from '../types'
+import { WorkoutType, WorkoutStatus } from '../types'
 
 export interface WorkoutValidationResult {
   isValid: boolean
@@ -24,7 +24,6 @@ export function validateWorkoutPayload(payload: {
   markdown?: string | null
   running_distance_km?: number | null
   running_duration_sec?: number | null
-  running_intensity?: RunningIntensity | string | null
   running_pace_sec_per_km?: number | null
 }): WorkoutValidationResult {
   const errors: string[] = []
@@ -36,7 +35,6 @@ export function validateWorkoutPayload(payload: {
     markdown = '',
     running_distance_km = null,
     running_duration_sec = null,
-    running_intensity = null,
     running_pace_sec_per_km = null,
   } = payload
 
@@ -73,11 +71,6 @@ export function validateWorkoutPayload(payload: {
       }
     }
 
-    // running_intensity validation
-    const validIntensities = ['easy', 'long', 'tempo', 'interval', 'race', 'unknown']
-    if (running_intensity && !validIntensities.includes(running_intensity as string)) {
-      errors.push(`올바르지 않은 러닝 강도입니다. ("${running_intensity}")`)
-    }
   } else {
     // 3. Non-Running Specific Validations: running fields are strictly forbidden!
     if (running_distance_km !== null) {
@@ -85,9 +78,6 @@ export function validateWorkoutPayload(payload: {
     }
     if (running_duration_sec !== null) {
       errors.push(`러닝이 아닌 운동(${type})에는 러닝 시간(duration)을 입력할 수 없습니다.`)
-    }
-    if (running_intensity !== null && running_intensity !== 'unknown') {
-      errors.push(`러닝이 아닌 운동(${type})에는 러닝 강도(running_intensity)를 입력할 수 없습니다.`)
     }
   }
 

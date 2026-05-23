@@ -98,10 +98,16 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
                       </p>
                     </div>
                   )}
-                  {workout.running_intensity && (
+                  {workout.running_pace_sec_per_km !== null && (
                     <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-50 border border-slate-100 shadow-inner">
-                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">강도</p>
-                      <p className="text-sm min-[375px]:text-base font-black text-orange-600 capitalize pt-0.5">{workout.running_intensity}</p>
+                      <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1">페이스</p>
+                      <p className="text-base min-[375px]:text-lg sm:text-xl font-extrabold text-slate-900 whitespace-nowrap">
+                        {(() => {
+                          const mins = Math.floor(workout.running_pace_sec_per_km / 60)
+                          const secs = (workout.running_pace_sec_per_km % 60).toString().padStart(2, '0')
+                          return `${mins}'${secs}"/km`
+                        })()}
+                      </p>
                     </div>
                   )}
                 </div>

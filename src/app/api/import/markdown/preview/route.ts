@@ -115,27 +115,32 @@ function parseBlock(blockText: string, lineStart: number, blockIndex: number): P
   }
 
   // Define supported & forbidden keys
-  const supportedKeys = ['status', 'title', 'running_distance_km', 'duration', 'running_intensity', 'notes']
-  const forbiddenKeys = ['running_duration_sec', 'running_pace_sec_per_km']
+  const supportedKeys = ['status', 'title', 'running_distance_km', 'duration', 'memo', 'notes']
+  const forbiddenKeys = ['running_duration_sec', 'running_pace_sec_per_km', 'running_intensity']
 
   const status = metadata['status'] || ''
   const title = metadata['title'] || null
   let running_distance_km: number | null = null
   let running_duration_sec: number | null = null
-  const running_intensity = metadata['running_intensity'] || null
+  const memo = metadata['memo'] || ''
   const notes = metadata['notes'] || null
 
   // Check metadata keys syntax
   for (const key of Object.keys(metadata)) {
     if (forbiddenKeys.includes(key)) {
-      errors.push(`금지된 key '${key}'가 사용되었습니다. (시간은 'duration: H:MM:SS' 형식을 써야 하며 페이스는 직접 기입할 수 없습니다.)`)
+      errors.push(`금지된 key '${key}'가 사용되었습니다. (시간은 'duration: H:MM:SS' 형식을 써야 하며 페이스와 강도는 직접 기입하거나 사용하실 수 없습니다.)`)
     } else if (!supportedKeys.includes(key)) {
       warnings.push(`지원하지 않는 key '${key}'는 무시되었습니다.`)
     }
   }
 
+  // Warn if free-form body text is written instead of 'memo'
+  if (markdown.trim().length > 0 && !metadata['memo']) {
+    errors.push(`상세 기록은 자유 형식 본문이 아닌 'memo: ...' 메타데이터 속성에 기입해야 합니다.`)
+  }
+
   // Validate non-running workout fields
-  const runningKeys = ['running_distance_km', 'duration', 'running_intensity']
+  const runningKeys = ['running_distance_km', 'duration']
   if (workoutType !== 'Running') {
     for (const rKey of runningKeys) {
       if (metadata[rKey] !== undefined) {
@@ -174,10 +179,9 @@ function parseBlock(blockText: string, lineStart: number, blockIndex: number): P
     workout_date,
     type: workoutType,
     status,
-    markdown: markdown.trim(),
+    markdown: memo.trim(),
     running_distance_km,
     running_duration_sec,
-    running_intensity,
     notes,
   }
 
@@ -198,12 +202,11 @@ function parseBlock(blockText: string, lineStart: number, blockIndex: number): P
     type: workoutType,
     status,
     title,
-    markdown: markdown.trim(),
+    markdown: memo.trim(),
     notes,
     running_distance_km,
     running_duration_sec,
     running_pace_sec_per_km,
-    running_intensity,
   }
 
   let finalType: 'valid' | 'invalid' | 'warning' = 'valid'

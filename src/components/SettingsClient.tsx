@@ -476,7 +476,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
               <textarea
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
-                placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;&#10;여기에 운동 일지 본문 마크다운 내용을 붙여넣으세요...&#10;---"
+                placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;memo: 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.&#10;---"
                 className="w-full min-h-[220px] bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-300"
               />
               
@@ -746,21 +746,67 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                 <p>
                   가져올 마크다운 백업은 반드시 아래 규격을 엄격히 지켜야 파싱 엔진이 해석할 수 있습니다:
                 </p>
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 font-mono text-[10.5px] leading-relaxed text-slate-700 whitespace-pre">
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 font-mono text-[10.5px] leading-relaxed text-slate-700 whitespace-pre max-h-[300px] overflow-y-auto">
 {`## 2026-05-21 Running
 status: completed
 running_distance_km: 6.0
 duration: 0:36:00
-running_intensity: easy
+memo: 야외 6km 러닝. 호흡 편하게 진행 완료.
 
-오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.
+---
+
+## 2026-05-21 Running
+status: planned
+running_distance_km: 5.0
+memo: 5km 회복 이지런 예정.
 
 ---
 
 ## 2026-05-22 Pull
 status: completed
+memo: 턱걸이 10회 5세트, 시티드로우 50kg 12회 3세트 완료.
 
-턱걸이 10회 5세트 진행 완료.`}
+---
+
+## 2026-05-22 Pull
+status: planned
+memo: 등 운동 루틴 (턱걸이, 시티드로우) 예정.
+
+---
+
+## 2026-05-23 Push
+status: completed
+memo: 벤치프레스 60kg 10회 5세트 완료.
+
+---
+
+## 2026-05-24 Leg
+status: completed
+memo: 스쿼트 80kg 8회 5세트 완료.
+
+---
+
+## 2026-05-25 Full
+status: completed
+memo: 데드리프트 100kg 5회 5세트 완료.
+
+---
+
+## 2026-05-26 Tennis
+status: completed
+memo: 코치님과 랠리 연습 1시간 완료.
+
+---
+
+## 2026-05-27 Rest
+status: completed
+memo: 근육통 회복을 위한 스트레칭 및 휴식.
+
+---
+
+## 2026-05-28 Other
+status: completed
+memo: 실내 자전거 40분 완료.`}
                 </div>
                 <div className="space-y-3.5 pt-2 border-t border-slate-100 text-slate-500 text-xs">
                   <p className="font-bold text-slate-800 flex items-center gap-1">📌 마크다운 파싱 및 동기화 최종 검증 규칙 (JOS v1 Spec)</p>
@@ -775,17 +821,20 @@ status: completed
                       <strong>상태값(status) 제약</strong>: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">completed</code>(완료됨)와 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">planned</code>(예정됨) **두 가지만 기입이 허용**되며, 어떠한 자동 치환이나 보정도 지원하지 않습니다. (예: `complete`나 `skipped`는 모두 에러 처리).
                     </li>
                     <li>
+                      <strong>상세 기록은 memo 필수</strong>: 본문 자유 형식 텍스트 대신 반드시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">memo: ...</code> 메타데이터 속성에 한 줄로 정교하게 작성해야 합니다. 자유 본문 작성 시 오류로 인식됩니다.
+                    </li>
+                    <li>
                       <strong>운동 종류별 필수/선택 제약</strong>:
                       <ul className="list-disc pl-4 mt-1 space-y-1 text-[11px] text-slate-500 font-medium">
                         <li><strong>Running + completed</strong>: 거리(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">running_distance_km</code>) <strong>필수</strong>, 시간(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">duration</code>) <strong>필수</strong></li>
                         <li><strong>Running + planned</strong>: 거리 선택, 시간 선택, 메모 선택</li>
-                        <li><strong>근력 운동군(Pull/Push/Leg/Full) + completed</strong>: 메모(본문) <strong>필수</strong> (세부 수행 기록 필수)</li>
+                        <li><strong>근력 운동군(Pull/Push/Leg/Full) + completed</strong>: 메모(<code className="bg-slate-50 text-slate-700 px-1 rounded font-mono text-[9px]">memo</code>) <strong>필수</strong> (세부 수행 기록 필수)</li>
                         <li><strong>근력 운동군(Pull/Push/Leg/Full) + planned</strong>: 메모 선택</li>
                         <li><strong>Tennis / Rest / Other + planned/completed</strong>: 메모 선택</li>
                       </ul>
                     </li>
                     <li>
-                      <strong>러닝 외 운동 수치 기입 제한</strong>: 러닝이 아닌 모든 운동(근력 운동군, 테니스, 휴식 등)에는 러닝 거리, 시간, 강도, 페이스 등의 수치 속성 기입이 <strong>엄격하게 금지</strong>되며, 기입 시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">invalid</code> 오류로 처리됩니다.
+                      <strong>러닝 외 운동 수치 기입 제한</strong>: 러닝이 아닌 모든 운동(근력 운동군, 테니스, 휴식 등)에는 러닝 거리, 시간, 페이스 등의 수치 속성 기입이 <strong>엄격하게 금지</strong>되며, 기입 시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">invalid</code> 오류로 처리됩니다. 강도(intensity) 속성은 시스템에서 삭제되어 사용하실 수 없습니다.
                     </li>
                     <li>
                       <strong>러닝 시간(duration) 기입 규칙</strong>: 반드시 <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">H:MM:SS</code> 형식(예: <code className="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-[10px] border border-slate-200">duration: 0:36:00</code>)을 엄수해야 합니다.

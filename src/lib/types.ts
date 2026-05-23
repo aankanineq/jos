@@ -9,7 +9,6 @@ export type WorkoutType =
   | 'Other'
 
 export type WorkoutStatus = 'planned' | 'completed'
-export type RunningIntensity = 'easy' | 'long' | 'tempo' | 'interval' | 'race' | 'unknown'
 
 export type WorkoutEntry = {
   id: string
@@ -22,7 +21,6 @@ export type WorkoutEntry = {
   running_distance_km: number | null
   running_duration_sec: number | null
   running_pace_sec_per_km: number | null
-  running_intensity: RunningIntensity | null
   notes: string | null
   created_at: string
   updated_at: string
