@@ -4,10 +4,71 @@ import { useState, useRef } from 'react'
 import { 
   Download, LogOut, Settings as SettingsIcon, Calendar, Activity, 
   Check, ShieldAlert, Upload, FileText, CheckCircle, AlertCircle, 
-  Loader2, ChevronDown, ChevronUp 
+  Loader2, ChevronDown, ChevronUp, Copy 
 } from 'lucide-react'
 import { format } from 'date-fns'
 import { logout } from '@/app/login/actions'
+
+const FULL_IMPORT_TEMPLATE = `## 2026-05-21 Running
+status: completed
+running_distance_km: 6.0
+duration: 0:36:00
+memo: 야외 6km 러닝. 호흡 편하게 진행 완료.
+
+---
+
+## 2026-05-21 Running
+status: planned
+running_distance_km: 5.0
+memo: 5km 회복 이지런 예정.
+
+---
+
+## 2026-05-22 Pull
+status: completed
+memo: 턱걸이 10회 5세트, 시티드로우 50kg 12회 3세트 완료.
+
+---
+
+## 2026-05-22 Pull
+status: planned
+memo: 등 운동 루틴 (턱걸이, 시티드로우) 예정.
+
+---
+
+## 2026-05-23 Push
+status: completed
+memo: 벤치프레스 60kg 10회 5세트 완료.
+
+---
+
+## 2026-05-24 Leg
+status: completed
+memo: 스쿼트 80kg 8회 5세트 완료.
+
+---
+
+## 2026-05-25 Full
+status: completed
+memo: 데드리프트 100kg 5회 5세트 완료.
+
+---
+
+## 2026-05-26 Tennis
+status: completed
+memo: 코치님과 랠리 연습 1시간 완료.
+
+---
+
+## 2026-05-27 Rest
+status: completed
+memo: 근육통 회복을 위한 스트레칭 및 휴식.
+
+---
+
+## 2026-05-28 Other
+status: completed
+memo: 실내 자전거 40분 완료.`
 
 interface SettingsClientProps {
   uniqueMonths: string[]
@@ -51,6 +112,15 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
   const [commitError, setCommitError] = useState<string[] | null>(null)
 
   const [showHelp, setShowHelp] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopyTemplate = () => {
+    navigator.clipboard.writeText(FULL_IMPORT_TEMPLATE)
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 2000)
+  }
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -742,71 +812,47 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             </button>
 
             {showHelp && (
-              <div className="px-4 pb-4 pt-1 border-t border-slate-100 space-y-3.5 text-xs text-slate-500 font-semibold leading-relaxed p-4 bg-white animate-in slide-in-from-top-2 duration-200">
-                <p>
-                  가져올 마크다운 백업은 반드시 아래 규격을 엄격히 지켜야 파싱 엔진이 해석할 수 있습니다:
-                </p>
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 font-mono text-[10.5px] leading-relaxed text-slate-700 whitespace-pre max-h-[300px] overflow-y-auto">
-{`## 2026-05-21 Running
-status: completed
-running_distance_km: 6.0
-duration: 0:36:00
-memo: 야외 6km 러닝. 호흡 편하게 진행 완료.
+              <div className="px-4 pb-4 pt-4 border-t border-slate-100 space-y-4 text-xs text-slate-500 font-semibold leading-relaxed p-4 bg-white animate-in slide-in-from-top-2 duration-200">
+                <div className="space-y-1">
+                  <p className="font-bold text-slate-800 text-sm">
+                    📋 통합 백업 데이터 구성 예시
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    아래는 8종 운동 전체의 계획/완료 양식이 포함된 전체 백업 파일 내용입니다. 오른쪽의 <strong>전체 예시 복사</strong> 버튼을 누르면 한 번에 클립보드로 복사됩니다!
+                  </p>
+                </div>
 
----
-
-## 2026-05-21 Running
-status: planned
-running_distance_km: 5.0
-memo: 5km 회복 이지런 예정.
-
----
-
-## 2026-05-22 Pull
-status: completed
-memo: 턱걸이 10회 5세트, 시티드로우 50kg 12회 3세트 완료.
-
----
-
-## 2026-05-22 Pull
-status: planned
-memo: 등 운동 루틴 (턱걸이, 시티드로우) 예정.
-
----
-
-## 2026-05-23 Push
-status: completed
-memo: 벤치프레스 60kg 10회 5세트 완료.
-
----
-
-## 2026-05-24 Leg
-status: completed
-memo: 스쿼트 80kg 8회 5세트 완료.
-
----
-
-## 2026-05-25 Full
-status: completed
-memo: 데드리프트 100kg 5회 5세트 완료.
-
----
-
-## 2026-05-26 Tennis
-status: completed
-memo: 코치님과 랠리 연습 1시간 완료.
-
----
-
-## 2026-05-27 Rest
-status: completed
-memo: 근육통 회복을 위한 스트레칭 및 휴식.
-
----
-
-## 2026-05-28 Other
-status: completed
-memo: 실내 자전거 40분 완료.`}
+                {/* Unified Code Preview Block with Copy Button */}
+                <div className="relative border border-slate-200 rounded-3xl bg-slate-900 overflow-hidden shadow-md">
+                  <div className="flex items-center justify-between px-4 py-2.5 bg-slate-800 border-b border-slate-700">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest font-mono">
+                      FULL WORKOUT BACKUP EXAMPLE (JOS v1 Spec)
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleCopyTemplate}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black transition-all border cursor-pointer active:scale-97 ${
+                        copied
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-750 hover:text-white'
+                      }`}
+                    >
+                      {copied ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                          복사 완료!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          전체 예시 복사
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  <pre className="p-4 overflow-y-auto text-[11px] leading-relaxed text-slate-200 font-mono select-all bg-slate-900/90 whitespace-pre max-h-[300px]">
+                    {FULL_IMPORT_TEMPLATE}
+                  </pre>
                 </div>
                 <div className="space-y-3.5 pt-2 border-t border-slate-100 text-slate-500 text-xs">
                   <p className="font-bold text-slate-800 flex items-center gap-1">📌 마크다운 파싱 및 동기화 최종 검증 규칙 (JOS v1 Spec)</p>
