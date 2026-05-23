@@ -23,14 +23,15 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
    • 정식 정규식 포맷: ## YYYY-MM-DD WorkoutType
    • 허용되는 날짜: 반드시 '년(4자리)-월(2자리)-일(2자리)' 형태를 유지해야 합니다. (예: 2026-05-21)
    • 허용되는 운동 종류 (WorkoutType - 영어 대소문자 정확히 일치):
-     - Running (러닝)
-     - Pull (풀 - 등/이두)
-     - Push (푸쉬 - 가슴/어깨/삼두)
-     - Leg (레그 - 하체)
-     - Full (전신)
-     - Tennis (테니스)
-     - Rest (휴식)
-     - Other (기타)
+      - Running (러닝)
+      - Pull (풀 - 등/이두)
+      - Push (푸쉬 - 가슴/삼두)
+      - Leg (레그 - 하체)
+      - Full (전신)
+      - Tennis (테니스)
+      - Rest (휴식)
+      - Other (기타)
+      - Shoulder, Arm (어깨팔 - 어깨/이두/삼두)
    • 🚨 절대 허용하지 않는 예외 대상 (Invalid Header Cases):
      - 대괄호나 특수 기호가 날짜에 붙는 경우 (예: ## [2026-05-21] Running ❌)
      - 한글 운동 종류명이 섞인 경우 (예: ## 2026-05-21 러닝 ❌)
@@ -50,11 +51,11 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
    • 상세한 운동 일지 및 수행 내역은 반드시 'memo: ...' 메타데이터 키를 사용하여 한 줄로 정교하게 작성해야 합니다.
    • JOS v1 Spec은 메타데이터 블록 아래 빈 줄 뒤의 자유 형식 본문 기입을 지원하지 않습니다.
    • 🚨 근력 운동군 필수 규칙:
-     - Pull, Push, Leg, Full 종류의 completed(완료됨) 운동은 'memo' 필드가 필수입니다.
-     - memo 속성이 누락되거나 내용이 공백인 경우 invalid 오류가 발생합니다.
-     - planned(예정됨)일 때는 memo 필드가 선택사항입니다.
-   • 🚨 기타 운동군 규칙:
-     - Running, Tennis, Rest, Other 종류는 status에 상관없이 memo가 항상 선택사항입니다.
+      - Pull, Push, Leg, Full, Shoulder, Arm 종류의 completed(완료됨) 운동은 'memo' 필드가 필수입니다.
+      - memo 속성이 누락되거나 내용이 공백인 경우 invalid 오류가 발생합니다.
+      - planned(예정됨)일 때는 memo 필드가 선택사항입니다.
+    • 🚨 기타 운동군 규칙:
+      - Running, Tennis, Rest, Other 종류는 status에 상관없이 memo가 항상 선택사항입니다.
 
 4️⃣ 수치 데이터 및 비-러닝 운동 제약 규칙 (Numerical Field & Non-Running Protections)
    • 거리(Distance)와 시간(Duration)은 오직 Running(러닝) 운동 종류에만 입력 가능합니다.
@@ -73,7 +74,7 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
    • 🚨 러닝 계획(Running + planned) 요건:
      - running_distance_km 및 duration 속성은 자유로운 선택 사항입니다.
    • 🚨 러닝 이외 운동군(비-러닝 운동) 엄격 보호:
-     - Pull, Push, Leg, Full, Tennis, Rest, Other 세션에는 거리(running_distance_km), 시간(duration), 페이스 필드를 절대 입력할 수 없습니다.
+      - Pull, Push, Leg, Full, Tennis, Rest, Other, Shoulder, Arm 세션에는 거리(running_distance_km), 시간(duration), 페이스 필드를 절대 입력할 수 없습니다.
      - 기입 시 유효성 검사에서 invalid 오류가 발생합니다.
      - 강도(running_intensity) 필드는 시스템 전체에서 전면 소거되어, 기입 시 무시 혹은 invalid 처리됩니다.
 
@@ -150,7 +151,13 @@ memo: 근육통 회복을 위한 스트레칭 및 휴식.
 
 ## 2026-05-28 Other
 status: completed
-memo: 실내 자전거 40분 완료.`
+memo: 실내 자전거 40분 완료.
+
+---
+
+## 2026-05-28 Shoulder, Arm
+status: completed
+memo: 사래레 12kg 15회 5세트, 바벨컬 30kg 12회 4세트 완료.`
 
 interface SettingsClientProps {
   uniqueMonths: string[]
@@ -165,6 +172,7 @@ const WORKOUT_TYPES = [
   { id: 'Full', label: '🏋️ 전신 (Full)', color: 'border-purple-200 bg-purple-50/80 text-purple-700 hover:bg-purple-100/50' },
   { id: 'Rest', label: '🛌 휴식 (Rest)', color: 'border-slate-300 bg-slate-100 text-slate-700 hover:bg-slate-200/50' },
   { id: 'Other', label: '📝 기타 (Other)', color: 'border-rose-200 bg-rose-50/80 text-rose-700 hover:bg-rose-100/50' },
+  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', color: 'border-teal-200 bg-teal-50/80 text-teal-700 hover:bg-teal-100/50' },
 ]
 
 export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {

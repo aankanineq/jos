@@ -43,7 +43,7 @@ export function validateWorkoutPayload(payload: {
     errors.push(`올바르지 않은 날짜 형식입니다. (YYYY-MM-DD 형식 필요)`)
   }
 
-  const validTypes = ['Running', 'Pull', 'Push', 'Leg', 'Full', 'Tennis', 'Rest', 'Other']
+  const validTypes = ['Running', 'Pull', 'Push', 'Leg', 'Full', 'Tennis', 'Rest', 'Other', 'Shoulder, Arm']
   if (!type || !validTypes.includes(type as string)) {
     errors.push(`지원하지 않는 운동 종류입니다. ("${type}")`)
   }
@@ -89,7 +89,7 @@ export function validateWorkoutPayload(payload: {
   }
 
   // 5. Memo (Markdown) Requirements
-  const strengthTypes = ['Pull', 'Push', 'Leg', 'Full']
+  const strengthTypes = ['Pull', 'Push', 'Leg', 'Full', 'Shoulder, Arm']
   if (strengthTypes.includes(type as string) && isCompleted) {
     if (!markdown || markdown.trim().length === 0) {
       errors.push(`완료된 ${type} 운동은 세부 운동 기록(메모)이 필수입니다.`)

@@ -74,8 +74,20 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
     }
   }
 
-  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other']
+  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Running', 'Full', 'Tennis', 'Rest', 'Other', 'Shoulder, Arm']
   const statuses: WorkoutStatus[] = ['planned', 'completed']
+
+  const typeLabels: Record<WorkoutType, string> = {
+    Pull: '💪 풀 (Pull)',
+    Push: '🔥 푸쉬 (Push)',
+    Leg: '🦵 레그 (Leg)',
+    Running: '🏃 러닝 (Running)',
+    Full: '🏋️ 전신 (Full)',
+    Tennis: '🎾 테니스 (Tennis)',
+    Rest: '🛌 휴식 (Rest)',
+    Other: '📝 기타 (Other)',
+    'Shoulder, Arm': '🎯 어깨팔 (Shoulder, Arm)'
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto retro-card p-4 min-[390px]:p-6 sm:p-8 bg-white border border-slate-100">
@@ -120,7 +132,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
                   : 'bg-slate-50 text-slate-500 border-slate-100 hover:border-slate-200 hover:text-slate-800'
               }`}
             >
-              {t}
+              {typeLabels[t] || t}
             </button>
           ))}
         </div>

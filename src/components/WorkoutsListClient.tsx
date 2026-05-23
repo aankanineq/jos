@@ -25,6 +25,7 @@ const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: stri
   { id: 'Full', label: '🏋️ 전신 (Full)', icon: '🏋️', color: 'border-purple-200 bg-purple-50/40 text-purple-700 hover:bg-purple-50/80', activeColor: 'bg-purple-600 text-white border-purple-600' },
   { id: 'Rest', label: '🛌 휴식 (Rest)', icon: '🛌', color: 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100', activeColor: 'bg-slate-700 text-white border-slate-700' },
   { id: 'Other', label: '📝 기타 (Other)', icon: '📝', color: 'border-rose-200 bg-rose-50/40 text-rose-700 hover:bg-rose-50/80', activeColor: 'bg-rose-600 text-white border-rose-600' },
+  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-teal-200 bg-teal-50/40 text-teal-700 hover:bg-teal-50/80', activeColor: 'bg-teal-600 text-white border-teal-600' },
 ]
 
 export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClientProps) {

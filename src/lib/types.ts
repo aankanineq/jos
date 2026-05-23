@@ -7,6 +7,7 @@ export type WorkoutType =
   | 'Tennis'
   | 'Rest'
   | 'Other'
+  | 'Shoulder, Arm'
 
 export type WorkoutStatus = 'planned' | 'completed'
 
