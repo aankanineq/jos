@@ -20,12 +20,12 @@ const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: stri
   { id: 'Pull', label: '💪 풀 (Pull)', icon: '💪', color: 'border-indigo-200 bg-indigo-50/40 text-indigo-700 hover:bg-indigo-50/80', activeColor: 'bg-indigo-600 text-white border-indigo-600' },
   { id: 'Push', label: '🔥 푸쉬 (Push)', icon: '🔥', color: 'border-orange-200 bg-orange-50/40 text-orange-700 hover:bg-orange-50/80', activeColor: 'bg-orange-600 text-white border-orange-600' },
   { id: 'Leg', label: '🦵 레그 (Leg)', icon: '🦵', color: 'border-amber-200 bg-amber-50/40 text-amber-700 hover:bg-amber-50/80', activeColor: 'bg-amber-600 text-white border-amber-600' },
+  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-teal-200 bg-teal-50/40 text-teal-700 hover:bg-teal-50/80', activeColor: 'bg-teal-600 text-white border-teal-600' },
+  { id: 'Full', label: '🏋️ 전신 (Full)', icon: '🏋️', color: 'border-purple-200 bg-purple-50/40 text-purple-700 hover:bg-purple-50/80', activeColor: 'bg-purple-600 text-white border-purple-600' },
   { id: 'Running', label: '🏃 러닝 (Running)', icon: '🏃', color: 'border-blue-200 bg-blue-50/40 text-blue-700 hover:bg-blue-50/80', activeColor: 'bg-blue-600 text-white border-blue-600' },
   { id: 'Tennis', label: '🎾 테니스 (Tennis)', icon: '🎾', color: 'border-emerald-200 bg-emerald-50/40 text-emerald-700 hover:bg-emerald-50/80', activeColor: 'bg-emerald-600 text-white border-emerald-600' },
-  { id: 'Full', label: '🏋️ 전신 (Full)', icon: '🏋️', color: 'border-purple-200 bg-purple-50/40 text-purple-700 hover:bg-purple-50/80', activeColor: 'bg-purple-600 text-white border-purple-600' },
   { id: 'Rest', label: '🛌 휴식 (Rest)', icon: '🛌', color: 'border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100', activeColor: 'bg-slate-700 text-white border-slate-700' },
   { id: 'Other', label: '📝 기타 (Other)', icon: '📝', color: 'border-rose-200 bg-rose-50/40 text-rose-700 hover:bg-rose-50/80', activeColor: 'bg-rose-600 text-white border-rose-600' },
-  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-teal-200 bg-teal-50/40 text-teal-700 hover:bg-teal-50/80', activeColor: 'bg-teal-600 text-white border-teal-600' },
 ]
 
 const TYPE_LABELS: Record<string, string> = {
@@ -48,6 +48,7 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
   const [selectedType, setSelectedType] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [isTypeFilterOpen, setIsTypeFilterOpen] = useState(false)
+  const [isPeriodFilterOpen, setIsPeriodFilterOpen] = useState(false)
 
   // Multi-delete states
   const [isDeleteMode, setIsDeleteMode] = useState(false)
@@ -259,37 +260,65 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
       {/* Filter and Search Panel */}
       <div className="retro-card p-6 sm:p-7 bg-white border border-slate-100 space-y-6">
         
-        {/* Row 1: Period Selection (Month) */}
-        <div className="space-y-2.5">
-          <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-slate-500" />
-            기간 선택 (Period)
-          </label>
-          <div className="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1">
+        {/* Row 1: Period Selection (Month - Collapsible) */}
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-slate-500" />
+              기간 선택 (Period)
+            </label>
+            
+            {/* Expand / Collapse Toggle Button */}
             <button
-              onClick={() => setSelectedMonth('all')}
-              className={`px-4 py-2.5 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
-                selectedMonth === 'all'
-                  ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                  : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
-              }`}
+              type="button"
+              onClick={() => setIsPeriodFilterOpen(!isPeriodFilterOpen)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
             >
-              전체 기간
+              <span>현재 선택: <strong>{selectedMonth === 'all' ? '전체 기간' : formatMonthLabel(selectedMonth)}</strong></span>
+              {isPeriodFilterOpen ? (
+                <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+              )}
             </button>
-            {uniqueMonths.map((m) => (
+          </div>
+
+          {/* Period Panel with Smooth Collapse/Expand */}
+          {isPeriodFilterOpen && (
+            <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
               <button
-                key={m}
-                onClick={() => setSelectedMonth(m)}
-                className={`px-4 py-2.5 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
-                  selectedMonth === m
+                type="button"
+                onClick={() => {
+                  setSelectedMonth('all')
+                  setIsPeriodFilterOpen(false) // Close panel after selection to save space
+                }}
+                className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
+                  selectedMonth === 'all'
                     ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                    : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350 hover:text-slate-800'
                 }`}
               >
-                {formatMonthLabel(m)}
+                전체 기간
               </button>
-            ))}
-          </div>
+              {uniqueMonths.map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => {
+                    setSelectedMonth(m)
+                    setIsPeriodFilterOpen(false) // Close panel after selection to save space
+                  }}
+                  className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 ${
+                    selectedMonth === m
+                      ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350 hover:text-slate-800'
+                  }`}
+                >
+                  {formatMonthLabel(m)}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Row 2: Workout Type Selection (Collapsible Horizontal Pills) */}
