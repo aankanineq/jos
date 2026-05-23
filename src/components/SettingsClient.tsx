@@ -58,10 +58,18 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
 
 4️⃣ 수치 데이터 및 비-러닝 운동 제약 규칙 (Numerical Field & Non-Running Protections)
    • 거리(Distance)와 시간(Duration)은 오직 Running(러닝) 운동 종류에만 입력 가능합니다.
-   • 🚨 러닝 완료(Running + completed) 필수 요건:
-     - running_distance_km: 소수점 또는 정수형태의 0보다 큰 숫자 필수 (예: running_distance_km: 6.2)
-     - duration: 시간(Hour), 분(Minute), 초(Second)를 모두 콜론(:)으로 나눈 'H:MM:SS' 형식 필수 (예: duration: 0:36:00)
-     - 시간/분/초를 생략하거나 단순 초 기입 시 invalid 오류가 납니다.
+   • 🚨 러닝 완료(Running + completed) 표준 규격 및 필수 요건:
+     - 반드시 아래와 같은 포맷 구조와 데이터 형식을 준수해야 오차 없는 정밀 분석이 가능합니다:
+
+       ## YYYY-MM-DD Running
+       status: completed
+       running_distance_km: 숫자
+       duration: H:MM:SS
+       memo: 기준앱: Nike / 유형: ... / 위치: ... / 평균 페이스: ... / 칼로리: ... / 고도 상승: ... / 평균 심박수: ... / 케이던스: ... / 신발: ... / 구간: ... / 해석: ...
+
+     - running_distance_km: 0보다 큰 숫자 형태여야 합니다 (소수점 지원).
+     - duration: 시간(Hour), 분(Minute), 초(Second)가 콜론으로 구분된 'H:MM:SS' 규격을 엄격히 지켜야 합니다.
+     - memo: 슬래시(/)를 구분 기호로 기입하여 모든 디테일 정보를 누락 없이 한 줄로 보존할 수 있습니다.
    • 🚨 러닝 계획(Running + planned) 요건:
      - running_distance_km 및 duration 속성은 자유로운 선택 사항입니다.
    • 🚨 러닝 이외 운동군(비-러닝 운동) 엄격 보호:
@@ -87,7 +95,7 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
 status: completed
 running_distance_km: 6.0
 duration: 0:36:00
-memo: 야외 6km 러닝. 호흡 편하게 진행 완료.
+memo: 기준앱: Nike / 유형: 이지런 / 위치: 한강공원 / 평균 페이스: 6'00" / 칼로리: 420kcal / 고도 상승: 15m / 평균 심박수: 145bpm / 케이던스: 172spm / 신발: 페가수스 40 / 구간: 1km 6'12", 2km 6'05", 3km 5'58", 4km 6'01", 5km 5'55", 6km 5'49" / 해석: 전반적으로 호흡이 매우 편안했고 중후반 빌드업이 매끄럽게 진행됨.
 
 ---
 
