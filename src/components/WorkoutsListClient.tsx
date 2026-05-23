@@ -557,8 +557,8 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
                         </h4>
                         <span className={`text-[10px] px-2 py-0.5 rounded-lg font-black uppercase tracking-wider ${
                           w.status === 'completed' 
-                            ? 'bg-emerald-600 text-white border border-emerald-600 shadow-sm shadow-emerald-100/50' 
-                            : 'bg-slate-50 text-slate-400 border border-dashed border-slate-350 font-extrabold'
+                            ? 'bg-slate-900 text-white border border-slate-900 shadow-sm shadow-slate-100/50' 
+                            : 'bg-white text-slate-400 border border-slate-200 font-extrabold'
                         }`}>
                           {w.status === 'completed' ? '완료' : '계획'}
                         </span>

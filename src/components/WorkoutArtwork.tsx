@@ -43,48 +43,6 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
     label: type.trim().toUpperCase() === 'RUNNING' ? 'RUN' : type.trim().toUpperCase()
   }
 
-  // Ring styling based on status (flat, clean, ultra-minimalist)
-  const renderStatusRing = () => {
-    if (status === 'completed') {
-      return (
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#10b981"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-      )
-    } else if (status === 'planned') {
-      return (
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#3b82f6"
-          strokeWidth="2"
-          strokeDasharray="4 3"
-        />
-      )
-    } else {
-      // skipped
-      return (
-        <circle
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          stroke="#94a3b8"
-          strokeWidth="1.5"
-          strokeDasharray="2 2"
-        />
-      )
-    }
-  }
-
   // Dynamic font sizing based on label length to prevent overflow inside circle (made larger and bolder)
   const label = theme.label
   let fontSize = '28px'
@@ -104,8 +62,8 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
         viewBox="0 0 100 100"
         className="w-full h-full drop-shadow-[0_2px_5px_rgba(15,23,42,0.06)]"
       >
-        {/* Typographical Circular Badge */}
-        <circle cx="50" cy="50" r="45" fill={theme.bg} />
+        {/* Typographical Circular Badge - Ultra-minimal borderless */}
+        <circle cx="50" cy="50" r="48" fill={theme.bg} />
         
         {/* Bold Modern Text Centerpiece */}
         <text
@@ -121,9 +79,6 @@ export default function WorkoutArtwork({ type, status = 'completed', size = 'md'
         >
           {label}
         </text>
-
-        {/* Outer Ring Gauge for Status */}
-        {renderStatusRing()}
       </svg>
     </div>
   )
