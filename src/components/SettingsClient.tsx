@@ -181,11 +181,11 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
   const [selectedMonths, setSelectedMonths] = useState<string[]>([])
   const [isAllTypes, setIsAllTypes] = useState(true)
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
+  const [isPeriodExportOpen, setIsPeriodExportOpen] = useState(false)
+  const [isTypeExportOpen, setIsTypeExportOpen] = useState(false)
 
   // --- Import States ---
-  const [importTab, setImportTab] = useState<'file' | 'paste'>('paste')
   const [pasteText, setPasteText] = useState('')
-  const [dragActive, setDragActive] = useState(false)
   const [importing, setImporting] = useState(false)
   
   // --- Preview & Commit States ---
@@ -211,8 +211,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
       setCopied(false)
     }, 2000)
   }
-  
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Convert YYYY-MM to Korean Date (e.g. 2026년 05월)
   const formatMonthLabel = (m: string) => {
@@ -364,52 +362,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
     }
   }
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true)
-    } else if (e.type === "dragleave") {
-      setDragActive(false)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0])
-    }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0])
-    }
-  }
-
-  const handleFile = (file: File) => {
-    if (!file.name.endsWith('.md') && !file.name.endsWith('.txt')) {
-      alert('마크다운 파일(.md) 또는 텍스트 파일(.txt)만 업로드할 수 있습니다.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.onload = async (event) => {
-      const text = event.target?.result
-      if (typeof text === 'string') {
-        await executeImport(text)
-      }
-    }
-    reader.readAsText(file, 'UTF-8')
-  }
-
-  const triggerFileSelect = () => {
-    fileInputRef.current?.click()
-  }
-
   return (
     <div className="space-y-8 animate-in fade-in pb-24 max-w-2xl mx-auto px-4 md:px-0">
       <header className="mb-8">
@@ -420,127 +372,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
         <p className="text-slate-500 mt-1.5 font-semibold tracking-wide">데이터 관리 및 계정 관련 설정입니다.</p>
       </header>
 
-      {/* 1. Selective Data Export Section */}
-      <section className="retro-card p-6 sm:p-8 space-y-8">
-        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-          <Download className="w-6 h-6 text-slate-800" />
-          <h2 className="text-xl font-bold text-slate-900 tracking-wide">데이터 마크다운 내보내기 (Export)</h2>
-        </div>
-
-        <div className="space-y-6">
-          <p className="text-sm text-slate-500 font-semibold leading-relaxed">
-            기록해두신 운동 로그를 Notion이나 Obsidian 등에서 바로 활용할 수 있는 **마크다운 (.md)** 형식으로 백업합니다. 원하는 기간과 운동 종류를 체크해보세요.
-          </p>
-
-          {/* Period Selection */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-slate-500" />
-              1. 기간 필터 선택
-            </h3>
-            
-            <div className="flex flex-wrap gap-2.5">
-              <button
-                type="button"
-                onClick={handleToggleAllMonths}
-                className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
-                  isAllMonths
-                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                    : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
-                }`}
-              >
-                {isAllMonths && <Check className="w-4 h-4" />}
-                전체 기간 (All)
-              </button>
-
-              {uniqueMonths.length === 0 ? (
-                <div className="text-xs font-semibold text-slate-400 py-2.5">기록된 운동 기간이 없습니다.</div>
-              ) : (
-                uniqueMonths.map((m) => {
-                  const isChecked = !isAllMonths && selectedMonths.includes(m)
-                  return (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => handleToggleMonth(m)}
-                      className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
-                        isChecked
-                          ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                          : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
-                      }`}
-                    >
-                      {isChecked && <Check className="w-4 h-4" />}
-                      {formatMonthLabel(m)}
-                    </button>
-                  )
-                })
-              )}
-            </div>
-          </div>
-
-          {/* Workout Type Selection */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-slate-500" />
-              2. 운동 종류 필터 선택
-            </h3>
-            
-            <div className="flex flex-wrap gap-2.5">
-              <button
-                type="button"
-                onClick={handleToggleAllTypes}
-                className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
-                  isAllTypes
-                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                    : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
-                }`}
-              >
-                {isAllTypes && <Check className="w-4 h-4" />}
-                전체 운동 (All)
-              </button>
-
-              {WORKOUT_TYPES.map((t) => {
-                const isChecked = !isAllTypes && selectedTypes.includes(t.id)
-                return (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => handleToggleType(t.id)}
-                    className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
-                      isChecked
-                        ? `${t.color} border-2 shadow-sm scale-102`
-                        : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
-                    }`}
-                  >
-                    {isChecked && <Check className="w-4 h-4" />}
-                    {t.label}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Export Action trigger */}
-          <div className="pt-4 border-t border-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="text-xs font-bold text-slate-400 space-y-0.5">
-              <p>📍 현재 선택 필터 요약</p>
-              <p className="text-slate-600">
-                기간: {isAllMonths ? '전체' : selectedMonths.map(m => formatMonthLabel(m)).join(', ')} | 운동: {isAllTypes ? '전체' : selectedTypes.map(tId => WORKOUT_TYPES.find(w => w.id === tId)?.label.split(' ')[1] || tId).join(', ')}
-              </p>
-            </div>
-            
-            <button
-              onClick={handleExportMarkdown}
-              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-7 py-3.5 rounded-2xl font-bold transition-all shadow-sm hover:scale-102 active:scale-98 cursor-pointer"
-            >
-              <Download className="w-5 h-5" />
-              마크다운 파일 다운로드
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Selective Data Import Section [NEW] */}
+      {/* 1. Selective Data Import Section */}
       <section className="retro-card p-6 sm:p-8 space-y-8">
         <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
           <Upload className="w-6 h-6 text-slate-800" />
@@ -552,124 +384,36 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
             백업해두었거나 수동으로 작성한 마크다운 파일(`.md`) 또는 텍스트를 불러와 운동 기록을 복원합니다. 동일한 날짜와 운동 종류의 기록이 이미 존재하더라도 덮어쓰지 않고 <strong>신규 기록으로 각각 안전하게 추가(Insert)</strong>됩니다.
           </p>
 
-          {/* Import Tabs */}
-          <div className="flex border-b border-slate-100 gap-6">
-            <button
-              type="button"
-              onClick={() => { 
-                setImportTab('file'); 
-                setPreviewStats(null);
-                setPreviewBlocks(null);
-                setSelectedBlockIndexes([]);
-                setCommitSuccessCount(null);
-                setCommitError(null);
-              }}
-              className={`pb-2.5 text-sm font-extrabold tracking-wide transition-all border-b-2 cursor-pointer ${
-                importTab === 'file'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              파일 업로드 (.md)
-            </button>
-            <button
-              type="button"
-              onClick={() => { 
-                setImportTab('paste'); 
-                setPreviewStats(null);
-                setPreviewBlocks(null);
-                setSelectedBlockIndexes([]);
-                setCommitSuccessCount(null);
-                setCommitError(null);
-              }}
-              className={`pb-2.5 text-sm font-extrabold tracking-wide transition-all border-b-2 cursor-pointer ${
-                importTab === 'paste'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-400 hover:text-slate-600'
-              }`}
-            >
-              텍스트 붙여넣기
-            </button>
-          </div>
-
-          {/* Tab 1: Drag & Drop File Upload Area */}
-          {importTab === 'file' && (
-            <div className="space-y-4">
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept=".md,.txt" 
-                className="hidden" 
-              />
-              
-              <div
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onDrop={handleDrop}
-                onClick={triggerFileSelect}
-                className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 gap-3 group text-center min-h-[180px] ${
-                  dragActive
-                    ? 'border-slate-800 bg-slate-50 scale-99'
-                    : 'border-slate-200 bg-white hover:border-slate-400 hover:bg-slate-50/50'
-                }`}
+          {/* Paste Text Area */}
+          <div className="space-y-4">
+            <textarea
+              value={pasteText}
+              onChange={(e) => setPasteText(e.target.value)}
+              placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;memo: 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.&#10;---"
+              className="w-full min-h-[220px] bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-300"
+            />
+            
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => executeImport(pasteText)}
+                disabled={importing || !pasteText.trim()}
+                className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed"
               >
-                <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform duration-300">
-                  <FileText className="w-8 h-8 text-slate-700" />
-                </div>
-                <div>
-                  <p className="text-sm font-extrabold text-slate-800">
-                    여기에 마크다운 백업 파일을 끌어다 놓으세요
-                  </p>
-                  <p className="text-xs text-slate-400 font-semibold mt-1">
-                    또는 마우스로 클릭하여 내 컴퓨터에서 파일 찾기 (.md, .txt)
-                  </p>
-                </div>
-              </div>
+                {importing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    가져오는 중...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    기록 가져오기 실행
+                  </>
+                )}
+              </button>
             </div>
-          )}
-
-          {/* Tab 2: Paste Text Area */}
-          {importTab === 'paste' && (
-            <div className="space-y-4">
-              <textarea
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                placeholder="---&#10;## 2026-05-21 Running&#10;status: completed&#10;running_distance_km: 6.0&#10;duration: 0:36:00&#10;memo: 오늘 야외 6km 러닝! 기분 좋게 마무리했습니다.&#10;---"
-                className="w-full min-h-[220px] bg-slate-50 border border-slate-200 focus:border-slate-400 focus:ring-1 focus:ring-slate-400 rounded-2xl p-4 font-mono text-sm focus:outline-none transition-all placeholder:text-slate-300"
-              />
-              
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => executeImport(pasteText)}
-                  disabled={importing || !pasteText.trim()}
-                  className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-200 text-white disabled:text-slate-400 px-6 py-3 rounded-2xl font-bold transition-all shadow-sm active:scale-98 cursor-pointer disabled:cursor-not-allowed"
-                >
-                  {importing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      가져오는 중...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-4 h-4" />
-                      기록 가져오기 실행
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Loading Indicator for File Upload */}
-          {importing && importTab === 'file' && (
-            <div className="flex items-center justify-center gap-2 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 font-bold text-sm animate-pulse">
-              <Loader2 className="w-5 h-5 animate-spin text-slate-800" />
-              파일 분석 및 데이터 프리뷰 생성 중...
-            </div>
-          )}
+          </div>
 
           {/* Commit Success Notification Banner */}
           {commitSuccessCount !== null && (
@@ -877,7 +621,7 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                       </>
                     ) : (
                       <>
-                        <Check className="w-4.h-4" />
+                        <Check className="w-4 h-4" />
                         데이터베이스 최종 저장
                       </>
                     )}
@@ -886,7 +630,6 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
               </div>
             </div>
           )}
-
 
           {/* Form Help / Formatting Rules Accordion */}
           <div className="border border-slate-100 rounded-2xl overflow-hidden transition-all bg-slate-50/40">
@@ -946,6 +689,162 @@ export default function SettingsClient({ uniqueMonths }: SettingsClientProps) {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* 2. Selective Data Export Section */}
+      <section className="retro-card p-6 sm:p-8 space-y-8">
+        <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
+          <Download className="w-6 h-6 text-slate-800" />
+          <h2 className="text-xl font-bold text-slate-900 tracking-wide">데이터 마크다운 내보내기 (Export)</h2>
+        </div>
+
+        <div className="space-y-6">
+          <p className="text-sm text-slate-500 font-semibold leading-relaxed">
+            기록해두신 운동 로그를 Notion이나 Obsidian 등에서 바로 활용할 수 있는 **마크다운 (.md)** 형식으로 백업합니다. 원하는 기간과 운동 종류를 체크해보세요.
+          </p>
+
+          {/* Period Selection */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-slate-500" />
+                1. 기간 필터 선택
+              </h3>
+              
+              {/* Expand / Collapse Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsPeriodExportOpen(!isPeriodExportOpen)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+              >
+                <span>현재 선택: <strong>{isAllMonths ? '전체 기간' : `${selectedMonths.length}개 월 선택됨`}</strong></span>
+                {isPeriodExportOpen ? (
+                  <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                )}
+              </button>
+            </div>
+            
+            {isPeriodExportOpen && (
+              <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
+                <button
+                  type="button"
+                  onClick={handleToggleAllMonths}
+                  className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                    isAllMonths
+                      ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                      : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
+                  }`}
+                >
+                  {isAllMonths && <Check className="w-4 h-4" />}
+                  전체 기간 (All)
+                </button>
+
+                {uniqueMonths.length === 0 ? (
+                  <div className="text-xs font-semibold text-slate-400 py-2.5">기록된 운동 기간이 없습니다.</div>
+                ) : (
+                  uniqueMonths.map((m) => {
+                    const isChecked = !isAllMonths && selectedMonths.includes(m)
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => handleToggleMonth(m)}
+                        className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                          isChecked
+                            ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                            : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
+                        }`}
+                      >
+                        {isChecked && <Check className="w-4 h-4" />}
+                        {formatMonthLabel(m)}
+                      </button>
+                    )
+                  })
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Workout Type Selection */}
+          <div className="space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <h3 className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-slate-500" />
+                2. 운동 종류 필터 선택
+              </h3>
+              
+              {/* Expand / Collapse Toggle Button */}
+              <button
+                type="button"
+                onClick={() => setIsTypeExportOpen(!isTypeExportOpen)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition-all cursor-pointer active:scale-97 shadow-sm"
+              >
+                <span>현재 선택: <strong>{isAllTypes ? '전체 운동' : `${selectedTypes.length}개 종류 선택됨`}</strong></span>
+                {isTypeExportOpen ? (
+                  <ChevronUp className="w-3.5 h-3.5 text-slate-500" />
+                ) : (
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-500" />
+                )}
+              </button>
+            </div>
+            
+            {isTypeExportOpen && (
+              <div className="flex flex-wrap gap-2.5 pr-1 py-1 animate-in fade-in slide-in-from-top-1.5 duration-200">
+                <button
+                  type="button"
+                  onClick={handleToggleAllTypes}
+                  className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                    isAllTypes
+                      ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                      : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
+                  }`}
+                >
+                  {isAllTypes && <Check className="w-4 h-4" />}
+                  전체 운동 (All)
+                </button>
+
+                {WORKOUT_TYPES.map((t) => {
+                  const isChecked = !isAllTypes && selectedTypes.includes(t.id)
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => handleToggleType(t.id)}
+                      className={`px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all flex items-center gap-1.5 active:scale-97 cursor-pointer ${
+                        isChecked
+                          ? `${t.color} border-2 shadow-sm scale-102`
+                          : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200 hover:text-slate-700'
+                      }`}
+                    >
+                      {isChecked && <Check className="w-4 h-4" />}
+                      {t.label}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Export Action trigger */}
+          <div className="pt-4 border-t border-slate-50 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-xs font-bold text-slate-400 space-y-0.5">
+              <p>📍 현재 선택 필터 요약</p>
+              <p className="text-slate-600">
+                기간: {isAllMonths ? '전체' : selectedMonths.map(m => formatMonthLabel(m)).join(', ')} | 운동: {isAllTypes ? '전체' : selectedTypes.map(tId => WORKOUT_TYPES.find(w => w.id === tId)?.label.split(' ')[1] || tId).join(', ')}
+              </p>
+            </div>
+            
+            <button
+              onClick={handleExportMarkdown}
+              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-7 py-3.5 rounded-2xl font-bold transition-all shadow-sm hover:scale-102 active:scale-98 cursor-pointer"
+            >
+              <Download className="w-5 h-5" />
+              마크다운 파일 다운로드
+            </button>
           </div>
         </div>
       </section>

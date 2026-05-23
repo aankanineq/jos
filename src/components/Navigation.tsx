@@ -49,13 +49,6 @@ export default function Navigation() {
               })}
             </nav>
           </div>
-          <Link
-            href="/workouts/new"
-            className="flex items-center gap-2 text-sm font-bold bg-slate-900 hover:bg-slate-800 text-white px-5 py-2 rounded-xl transition-all duration-300 shadow-sm"
-          >
-            <PlusCircle className="w-4 h-4" />
-            기록 추가
-          </Link>
         </div>
       </header>
 
