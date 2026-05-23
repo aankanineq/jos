@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Home, List, Settings, PlusCircle } from 'lucide-react'
+import { Calendar, Activity, List, Settings, PlusCircle } from 'lucide-react'
 import clsx from 'clsx'
 
 export default function Navigation() {
   const pathname = usePathname()
 
   const navItems = [
-    { name: 'Dashboard', href: '/', icon: Home },
+    { name: 'Running', href: '/running', icon: Activity },
     { name: 'Calendar', href: '/calendar', icon: Calendar },
     { name: 'Workouts', href: '/workouts', icon: List },
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -22,7 +22,7 @@ export default function Navigation() {
         <div className="flex-1 w-full max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link
-              href="/"
+              href="/running"
               className="font-extrabold text-xl tracking-wider text-slate-900 transition-transform duration-300 hover:scale-102"
             >
               JOS
