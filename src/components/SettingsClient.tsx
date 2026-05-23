@@ -9,7 +9,29 @@ import {
 import { format } from 'date-fns'
 import { logout } from '@/app/login/actions'
 
-const FULL_IMPORT_TEMPLATE = `## 2026-05-21 Running
+const FULL_IMPORT_TEMPLATE = `# JOS 마크다운 가져오기 최종 규격 및 예시 (JOS v1 Spec)
+
+본 예시 파일은 JOS(Journey of Strength) 운동로그 백업 최종 스펙을 완벽히 충족하는 통합 문서입니다.
+우측 상단의 "전체 예시 복사" 버튼을 눌러 가져오기 입력창에 붙여넣으면 유효성 검증 테스트를 즉시 수행할 수 있습니다.
+(※ 첫 설명 영역은 규격 헤더가 없으므로 '저장 불가' 처리가 되며, 아래의 10개 실제 운동 기록 블록은 전부 '저장 가능'으로 정상 분석됩니다.)
+
+📌 [최종 검증 규칙 요약]
+1. 헤더 규격: ## YYYY-MM-DD WorkoutType (영어 전용, 대괄호/이모지/한글 금지)
+   - 지원 운동종류: Running, Pull, Push, Leg, Full, Tennis, Rest, Other
+2. 진행 상태: status: planned 또는 status: completed 만 허용 (자동 치환 및 보정 없음)
+3. 상세 기록(메모) 필수 규칙:
+   - 근력 운동군(Pull/Push/Leg/Full) 완료(completed) 기록은 'memo: ...' 메타데이터 기입 필수
+   - 모든 상세 기록은 본문 텍스트가 아닌 'memo: ...' 속성에 작성해야 함 (자유 본문 기입 시 invalid)
+4. 수치 제약:
+   - Running completed: 거리(running_distance_km) 및 시간(duration: H:MM:SS) 필수
+   - Running planned: 거리 및 시간 선택
+   - 비-러닝 운동: 러닝 거리/시간/페이스 기입 시 에러 (강도 intensity 속성은 삭제됨)
+5. 페이스(pace): 직접 입력이 불가하며 거리와 시간이 모두 있을 시 자동으로 산출
+6. 가져오기 방식: 기존 데이터를 덮어쓰지 않고 항상 새로운 행으로 추가(Insert)
+
+---
+
+## 2026-05-21 Running
 status: completed
 running_distance_km: 6.0
 duration: 0:36:00
