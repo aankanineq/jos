@@ -33,7 +33,6 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
   const [selectedMonth, setSelectedMonth] = useState<string>('all')
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [isTypeDropdownOpen, setIsTypeDropdownOpen] = useState(false)
 
   // Multi-delete states
   const [isDeleteMode, setIsDeleteMode] = useState(false)
@@ -278,103 +277,58 @@ export default function WorkoutsListClient({ initialWorkouts }: WorkoutsListClie
           </div>
         </div>
 
-        {/* Row 2: Workout Type Selection (Multi-Select Dropdown) */}
-        <div className="space-y-2.5 relative">
+        {/* Row 2: Workout Type Selection (Horizontal Pills with Multi-Select) */}
+        <div className="space-y-3">
           <label className="text-sm font-extrabold text-slate-800 flex items-center gap-2">
             <Activity className="w-4 h-4 text-slate-500" />
             운동 종류 선택 (Workout Type - 중복 선택 가능)
           </label>
-          
-          {/* Dropdown Trigger Button */}
-          <button
-            type="button"
-            onClick={() => setIsTypeDropdownOpen(!isTypeDropdownOpen)}
-            className="w-full flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-800 transition-all font-extrabold shadow-sm cursor-pointer hover:bg-slate-50/30 text-sm"
-          >
-            <div className="flex flex-wrap gap-1.5 items-center">
-              {selectedTypes.length === 0 ? (
-                <span className="text-slate-500 font-bold">👥 전체 운동 (All)</span>
-              ) : (
-                selectedTypes.map((typeId) => {
-                  const item = WORKOUT_TYPES.find(t => t.id === typeId)
-                  return (
-                    <span 
-                      key={typeId} 
-                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-950 text-white rounded-lg text-[10px] font-bold"
-                    >
-                      {item ? item.label.split(' ')[0] : ''} {typeId}
-                    </span>
-                  )
-                })
-              )}
-            </div>
-            {isTypeDropdownOpen ? (
-              <ChevronUp className="w-5 h-5 text-slate-500 shrink-0" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-slate-500 shrink-0" />
-            )}
-          </button>
+          <div className="flex flex-wrap gap-2.5 pr-1">
+            <button
+              type="button"
+              onClick={() => setSelectedTypes([])}
+              className={`px-4.5 py-3 rounded-2xl border text-xs font-bold transition-all duration-300 cursor-pointer shadow-sm active:scale-95 ${
+                selectedTypes.length === 0
+                  ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-500 hover:border-slate-350 hover:text-slate-800'
+              }`}
+            >
+              전체 운동
+            </button>
+            {WORKOUT_TYPES.map((t) => {
+              const isSelected = selectedTypes.includes(t.id)
+              const hasActiveFilters = selectedTypes.length > 0
+              
+              let buttonStyle = ""
+              if (!hasActiveFilters) {
+                // No specific filters: show all in their gorgeous outline-colored styles
+                buttonStyle = `${t.color} border`
+              } else if (isSelected) {
+                // This type is active: show in solid active style
+                buttonStyle = `${t.activeColor} border font-black scale-102 shadow-md shadow-slate-100`
+              } else {
+                // Other types are active: show this type as faded/muted
+                buttonStyle = `${t.color} border opacity-35 scale-98 hover:opacity-80`
+              }
 
-          {/* Dropdown Options Panel */}
-          {isTypeDropdownOpen && (
-            <>
-              {/* Click outside backdrop to close */}
-              <div 
-                className="fixed inset-0 z-40" 
-                onClick={() => setIsTypeDropdownOpen(false)}
-              />
-              <div className="absolute left-0 w-full bg-white border border-slate-200/80 rounded-2xl shadow-xl p-2.5 space-y-1 z-50 animate-in fade-in slide-in-from-top-2 duration-150 mt-1.5 max-h-[300px] overflow-y-auto">
+              return (
                 <button
+                  key={t.id}
                   type="button"
                   onClick={() => {
-                    setSelectedTypes([])
+                    if (isSelected) {
+                      setSelectedTypes(selectedTypes.filter(id => id !== t.id))
+                    } else {
+                      setSelectedTypes([...selectedTypes, t.id])
+                    }
                   }}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-black transition-all text-left cursor-pointer active:scale-99 ${
-                    selectedTypes.length === 0
-                      ? 'bg-slate-950 text-white shadow-sm font-black'
-                      : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-100'
-                  }`}
+                  className={`px-4.5 py-3 rounded-2xl text-xs font-bold transition-all duration-300 cursor-pointer active:scale-95 flex items-center gap-1.5 ${buttonStyle}`}
                 >
-                  <span>👥 전체 운동 선택 해제 (Show All)</span>
-                  {selectedTypes.length === 0 && <span>✓</span>}
+                  {t.label}
                 </button>
-                
-                <div className="h-px bg-slate-100 my-1.5" />
-
-                {WORKOUT_TYPES.map((t) => {
-                  const isSelected = selectedTypes.includes(t.id)
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedTypes(selectedTypes.filter(id => id !== t.id))
-                        } else {
-                          setSelectedTypes([...selectedTypes, t.id])
-                        }
-                      }}
-                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold transition-all text-left cursor-pointer active:scale-99 ${
-                        isSelected
-                          ? `${t.color} border-2 shadow-sm font-black text-slate-900`
-                          : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          readOnly
-                          className="w-4 h-4 text-slate-900 focus:ring-slate-900 border-slate-300 rounded cursor-pointer"
-                        />
-                        {t.label}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            </>
-          )}
+              )
+            })}
+          </div>
         </div>
 
         {/* Row 3: Live Search */}
