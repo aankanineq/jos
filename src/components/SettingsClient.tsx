@@ -9,25 +9,77 @@ import {
 import { format } from 'date-fns'
 import { logout } from '@/app/login/actions'
 
-const FULL_IMPORT_TEMPLATE = `# JOS 마크다운 가져오기 최종 규격 및 예시 (JOS v1 Spec)
+const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 & 최종 검증 스펙 (JOS v1 Spec)]
 
-본 예시 파일은 JOS(Journey of Strength) 운동로그 백업 최종 스펙을 완벽히 충족하는 통합 문서입니다.
-우측 상단의 "전체 예시 복사" 버튼을 눌러 가져오기 입력창에 붙여넣으면 유효성 검증 테스트를 즉시 수행할 수 있습니다.
+본 예시 파일은 JOS(Journey of Strength) 운동로그 백업 최종 스펙을 완벽하게 만족하는 통합 문서입니다.
+우측 상단의 "전체 예시 복사" 버튼을 누른 뒤 가져오기 입력창에 붙여넣으면 즉시 유효성 분석 테스트를 수행할 수 있습니다.
 (※ 첫 설명 영역은 규격 헤더가 없으므로 '저장 불가' 처리가 되며, 아래의 10개 실제 운동 기록 블록은 전부 '저장 가능'으로 정상 분석됩니다.)
 
-📌 [최종 검증 규칙 요약]
-1. 헤더 규격: ## YYYY-MM-DD WorkoutType (영어 전용, 대괄호/이모지/한글 금지)
-   - 지원 운동종류: Running, Pull, Push, Leg, Full, Tennis, Rest, Other
-2. 진행 상태: status: planned 또는 status: completed 만 허용 (자동 치환 및 보정 없음)
-3. 상세 기록(메모) 필수 규칙:
-   - 근력 운동군(Pull/Push/Leg/Full) 완료(completed) 기록은 'memo: ...' 메타데이터 기입 필수
-   - 모든 상세 기록은 본문 텍스트가 아닌 'memo: ...' 속성에 작성해야 함 (자유 본문 기입 시 invalid)
-4. 수치 제약:
-   - Running completed: 거리(running_distance_km) 및 시간(duration: H:MM:SS) 필수
-   - Running planned: 거리 및 시간 선택
-   - 비-러닝 운동: 러닝 거리/시간/페이스 기입 시 에러 (강도 intensity 속성은 삭제됨)
-5. 페이스(pace): 직접 입력이 불가하며 거리와 시간이 모두 있을 시 자동으로 산출
-6. 가져오기 방식: 기존 데이터를 덮어쓰지 않고 항상 새로운 행으로 추가(Insert)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️ [예외 방지용 정밀 검증 규칙 & 작성 약속 - 필독!]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣ 헤더 규격 (Header Standards)
+   • 정식 정규식 포맷: ## YYYY-MM-DD WorkoutType
+   • 허용되는 날짜: 반드시 '년(4자리)-월(2자리)-일(2자리)' 형태를 유지해야 합니다. (예: 2026-05-21)
+   • 허용되는 운동 종류 (WorkoutType - 영어 대소문자 정확히 일치):
+     - Running (러닝)
+     - Pull (풀 - 등/이두)
+     - Push (푸쉬 - 가슴/어깨/삼두)
+     - Leg (레그 - 하체)
+     - Full (전신)
+     - Tennis (테니스)
+     - Rest (휴식)
+     - Other (기타)
+   • 🚨 절대 허용하지 않는 예외 대상 (Invalid Header Cases):
+     - 대괄호나 특수 기호가 날짜에 붙는 경우 (예: ## [2026-05-21] Running ❌)
+     - 한글 운동 종류명이 섞인 경우 (예: ## 2026-05-21 러닝 ❌)
+     - 이모지나 아이콘이 붙는 경우 (예: ## 🗓️ 2026-05-21 Rest ❌)
+     - 축약어를 사용한 경우 (예: ## 2026-05-21 Run ❌)
+
+2️⃣ 진행 상태 (Workout Status Constraints)
+   • status 키에는 오직 아래의 두 단어만 입력할 수 있습니다:
+     - status: completed (운동 완료됨)
+     - status: planned (운동 예정됨 / 계획)
+   • 🚨 절대 허용하지 않는 예외 대상:
+     - complete (completed가 아닌 축약어 기입 시 invalid ❌)
+     - skipped / done / active / cancelled 등 정의되지 않은 임의 단어 ❌
+     - JOS v1 엔진은 오타나 유사 단어의 자동 보정(Auto-correction)을 지원하지 않고 차단합니다.
+
+3️⃣ 상세 기록 기입 규칙 (Memo & Markdown Rules)
+   • 상세한 운동 일지 및 수행 내역은 반드시 'memo: ...' 메타데이터 키를 사용하여 한 줄로 정교하게 작성해야 합니다.
+   • JOS v1 Spec은 메타데이터 블록 아래 빈 줄 뒤의 자유 형식 본문 기입을 지원하지 않습니다.
+   • 🚨 근력 운동군 필수 규칙:
+     - Pull, Push, Leg, Full 종류의 completed(완료됨) 운동은 'memo' 필드가 필수입니다.
+     - memo 속성이 누락되거나 내용이 공백인 경우 invalid 오류가 발생합니다.
+     - planned(예정됨)일 때는 memo 필드가 선택사항입니다.
+   • 🚨 기타 운동군 규칙:
+     - Running, Tennis, Rest, Other 종류는 status에 상관없이 memo가 항상 선택사항입니다.
+
+4️⃣ 수치 데이터 및 비-러닝 운동 제약 규칙 (Numerical Field & Non-Running Protections)
+   • 거리(Distance)와 시간(Duration)은 오직 Running(러닝) 운동 종류에만 입력 가능합니다.
+   • 🚨 러닝 완료(Running + completed) 필수 요건:
+     - running_distance_km: 소수점 또는 정수형태의 0보다 큰 숫자 필수 (예: running_distance_km: 6.2)
+     - duration: 시간(Hour), 분(Minute), 초(Second)를 모두 콜론(:)으로 나눈 'H:MM:SS' 형식 필수 (예: duration: 0:36:00)
+     - 시간/분/초를 생략하거나 단순 초 기입 시 invalid 오류가 납니다.
+   • 🚨 러닝 계획(Running + planned) 요건:
+     - running_distance_km 및 duration 속성은 자유로운 선택 사항입니다.
+   • 🚨 러닝 이외 운동군(비-러닝 운동) 엄격 보호:
+     - Pull, Push, Leg, Full, Tennis, Rest, Other 세션에는 거리(running_distance_km), 시간(duration), 페이스 필드를 절대 입력할 수 없습니다.
+     - 기입 시 유효성 검사에서 invalid 오류가 발생합니다.
+     - 강도(running_intensity) 필드는 시스템 전체에서 전면 소거되어, 기입 시 무시 혹은 invalid 처리됩니다.
+
+5️⃣ 페이스(Pace) 자동 연산 규칙
+   • 마크다운 백업 양식에 페이스를 뜻하는 'running_pace_sec_per_km' 필드는 직접 입력이 절대 불가능합니다.
+   • direct pace 기입 시 invalid로 거절되며, 거리와 시간이 입력되면 백엔드 엔진이 초 단위 페이스를 정밀하게 자동 계산 및 DB 바인딩을 전담합니다.
+
+6️⃣ 가져오기 처리 방식 (Transaction Import Policies)
+   • 가져오기(Import)는 기존 데이터를 덮어쓰거나 갱신하지 않고, 복사된 모든 블록을 데이터베이스에 항상 신규 추가(Insert)합니다.
+   • 동일 날짜에 같은 운동 종류가 여러 개 존재하더라도 정상적으로 여러 개의 캡슐로 보존됩니다.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 아래 템플릿 전체를 복사하여 테스트해보세요. (설명 영역은 헤더 미준수 'invalid'로 감지되며 실전 데이터는 전부 'valid'로 판정됩니다.)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ---
 
