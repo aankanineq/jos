@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { WorkoutEntry, WorkoutType, WorkoutStatus, RunningIntensity } from '@/lib/types'
 import { addWorkoutAction, editWorkoutAction } from '@/app/workouts/actions'
+import { validateWorkoutPayload } from '@/lib/workouts/validation'
 import { format } from 'date-fns'
 
 interface Props {
@@ -35,31 +36,31 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
     setErrorMsg(null)
     
     const formData = new FormData(e.currentTarget)
-    const markdownVal = (formData.get('markdown') as string || '').trim()
+    const workout_date = formData.get('workout_date') as string
     const status = formData.get('status') as WorkoutStatus
+    const markdownVal = (formData.get('markdown') as string || '').trim()
     
-    // 1. Validation for Pull/Push/Leg/Full + completed: markdown (memo) required
-    const strengthTypes = ['Pull', 'Push', 'Leg', 'Full']
-    if (strengthTypes.includes(type) && status === 'completed' && !markdownVal) {
-      setErrorMsg(`${type} 완료 기록은 세부 운동 기록(메모)이 필수입니다.`)
+    const running_distance_km = type === 'Running' && formData.get('running_distance_km')
+      ? Number(formData.get('running_distance_km'))
+      : null
+    const running_duration_sec = type === 'Running'
+      ? (Number(runningHour) * 3600 + Number(runningMin) * 60 + Number(runningSec) || null)
+      : null
+
+    const validationResult = validateWorkoutPayload({
+      workout_date,
+      type,
+      status,
+      markdown: markdownVal || null,
+      running_distance_km,
+      running_duration_sec,
+      running_intensity: null,
+    })
+
+    if (!validationResult.isValid) {
+      setErrorMsg(validationResult.errors.join(' / '))
       setIsSubmitting(false)
       return
-    }
-    
-    // 2. Validation for Running + completed: distance and duration required
-    if (type === 'Running' && status === 'completed') {
-      const distance = formData.get('running_distance_km')
-      const duration = Number(runningHour) * 3600 + Number(runningMin) * 60 + Number(runningSec)
-      if (!distance || Number(distance) <= 0) {
-        setErrorMsg('완료된 러닝 기록은 거리(km) 입력이 필수이며 0보다 커야 합니다.')
-        setIsSubmitting(false)
-        return
-      }
-      if (!duration || duration <= 0) {
-        setErrorMsg('완료된 러닝 기록은 전체 시간(시/분/초) 입력이 필수이며 0보다 커야 합니다.')
-        setIsSubmitting(false)
-        return
-      }
     }
     
     try {

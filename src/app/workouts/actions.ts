@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createWorkout, updateWorkout, deleteWorkout } from '@/lib/workouts/repository'
 import { CreateWorkoutPayload, UpdateWorkoutPayload, WorkoutType, WorkoutStatus, RunningIntensity } from '@/lib/types'
+import { validateWorkoutPayload, calculateRunningPace } from '@/lib/workouts/validation'
 
 function formDataToPayload(formData: FormData): CreateWorkoutPayload {
   const type = formData.get('type') as WorkoutType
@@ -15,13 +16,11 @@ function formDataToPayload(formData: FormData): CreateWorkoutPayload {
 
   const running_distance_km = isRunning && distanceRaw ? Number(distanceRaw) : null
   const running_duration_sec = isRunning && durationRaw ? Number(durationRaw) : null
-  let running_pace_sec_per_km = null
+  
+  // Calculate pace using shared calculator
+  const running_pace_sec_per_km = calculateRunningPace(running_distance_km, running_duration_sec)
 
-  if (isRunning && running_distance_km && running_duration_sec) {
-    running_pace_sec_per_km = Math.round(running_duration_sec / running_distance_km)
-  }
-
-  return {
+  const payload: CreateWorkoutPayload = {
     workout_date: formData.get('workout_date') as string,
     type,
     status,
@@ -33,6 +32,14 @@ function formDataToPayload(formData: FormData): CreateWorkoutPayload {
     running_pace_sec_per_km,
     running_intensity: isRunning ? ((formData.get('running_intensity') as RunningIntensity) || null) : null,
   }
+
+  // Validate the payload using the shared validation library
+  const validation = validateWorkoutPayload(payload)
+  if (!validation.isValid) {
+    throw new Error(`유효성 검사 실패: ${validation.errors.join(' / ')}`)
+  }
+
+  return payload
 }
 
 export async function addWorkoutAction(formData: FormData) {
