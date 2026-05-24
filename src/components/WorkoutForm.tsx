@@ -76,19 +76,19 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
     }
   }
 
-  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Shoulder, Arm', 'Full', 'Running', 'Tennis', 'Other']
+  const types: WorkoutType[] = ['Pull', 'Push', 'Leg', 'Shoulder, Arm', 'Full', 'Running', 'Tennis', 'Rest', 'Other']
   const statuses: WorkoutStatus[] = ['planned', 'completed']
 
   const typeLabels: Record<WorkoutType, string> = {
-    Pull: '💪 풀 (Pull)',
-    Push: '🔥 푸쉬 (Push)',
-    Leg: '🦵 레그 (Leg)',
-    Running: '🏃 러닝 (Running)',
-    Full: '🏋️ 전신 (Full)',
-    Tennis: '🎾 테니스 (Tennis)',
-    Rest: '🛌 휴식 (Rest)',
-    Other: '📝 기타 (Other)',
-    'Shoulder, Arm': '🎯 어깨팔 (Shoulder, Arm)'
+    Pull: '✦ 풀 (Pull)',
+    Push: '▲ 푸쉬 (Push)',
+    Leg: '▼ 레그 (Leg)',
+    Running: '⚡ 러닝 (Running)',
+    Full: '◆ 전신 (Full)',
+    Tennis: '● 테니스 (Tennis)',
+    Rest: '◌ 휴식 (Rest)',
+    Other: '▫ 기타 (Other)',
+    'Shoulder, Arm': '❖ 어깨팔 (Shoulder, Arm)'
   }
 
   return (
@@ -188,7 +188,7 @@ export default function WorkoutForm({ initialData, initialDate }: Props) {
         <div className="p-6 rounded-3xl border border-slate-100 bg-slate-50/30 space-y-4 animate-in fade-in duration-200">
           <div className="flex items-center gap-2 text-slate-800">
             <Info className="w-4 h-4 text-slate-500" />
-            <h3 className="font-bold text-sm tracking-wide">🏃 러닝 추가 측정 정보</h3>
+            <h3 className="font-bold text-sm tracking-wide">⚡ 러닝 추가 측정 정보</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             

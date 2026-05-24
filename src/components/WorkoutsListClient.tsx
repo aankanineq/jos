@@ -17,15 +17,15 @@ interface WorkoutsListClientProps {
 }
 
 const WORKOUT_TYPES: { id: WorkoutType; label: string; icon: string; color: string; activeColor: string }[] = [
-  { id: 'Pull', label: '풀 (Pull)', icon: '💪', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Push', label: '푸쉬 (Push)', icon: '🔥', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Leg', label: '레그 (Leg)', icon: '🦵', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', icon: '🎯', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Full', label: '전신 (Full)', icon: '🏋️', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Running', label: '러닝 (Running)', icon: '🏃', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Tennis', label: '테니스 (Tennis)', icon: '🎾', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Rest', label: '휴식 (Rest)', icon: '🛌', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
-  { id: 'Other', label: '기타 (Other)', icon: '📝', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Pull', label: '풀 (Pull)', icon: '✦', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Push', label: '푸쉬 (Push)', icon: '▲', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Leg', label: '레그 (Leg)', icon: '▼', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Shoulder, Arm', label: '어깨팔 (Shoulder, Arm)', icon: '❖', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Full', label: '전신 (Full)', icon: '◆', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Running', label: '러닝 (Running)', icon: '⚡', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Tennis', label: '테니스 (Tennis)', icon: '●', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Rest', label: '휴식 (Rest)', icon: '◌', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
+  { id: 'Other', label: '기타 (Other)', icon: '▫', color: 'border-slate-100 bg-slate-50/60 text-slate-600 hover:bg-slate-50 hover:text-slate-800', activeColor: 'bg-slate-900 text-white border-slate-900 shadow-sm' },
 ]
 
 const TYPE_LABELS: Record<string, string> = {
