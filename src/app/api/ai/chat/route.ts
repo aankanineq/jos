@@ -23,14 +23,13 @@ export async function POST(request: Request) {
     }
 
     // 1. 모델명 결정
-    let modelName = 'deepseek-chat' // Fast 기본값
+    let modelName = 'deepseek-v4-flash' // Fast 기본값 (DeepSeek V4 최신 패밀리)
     if (mode === 'pro') {
-      modelName = 'deepseek-reasoner' // Pro 추론 모델
+      modelName = 'deepseek-v4-pro' // Pro 추론 모델 (DeepSeek V4 최신 패밀리)
     }
 
-    // 2. 대화 기록 정규화 (deepseek-reasoner의 400 에러를 유발하는 이전 reasoning_content 필드 완전 소거)
+    // 2. 대화 기록 정규화 (이전 reasoning_content 필드를 소거하여 API 400 에러 호환성 보장)
     const normalizedMessages = messages.map((m: any) => {
-      // API 전송 시에는 오직 role과 content만 가도록 정제하여 호환성 보장
       return {
         role: m.role,
         content: m.content
@@ -43,9 +42,17 @@ export async function POST(request: Request) {
       messages: normalizedMessages,
     }
 
-    // deepseek-reasoner 모델은 temperature 등의 샘플링 파라미터를 지원하지 않으므로 fast 모드일 때만 기입
-    if (mode !== 'pro') {
-      apiPayload.temperature = 0.7
+    // 4. 최신 V4 모델 스펙에 맞게 thinking 및 reasoning_effort 설정
+    if (mode === 'pro') {
+      apiPayload.thinking = {
+        type: 'enabled'
+      }
+      apiPayload.reasoning_effort = 'high' // Pro 모드 전용 깊이 있는 사고 추론 설정 (high/max 지원)
+    } else {
+      apiPayload.thinking = {
+        type: 'disabled'
+      }
+      apiPayload.temperature = 0.7 // Fast 모드 샘플링 설정 (Pro는 temperature 무시됨)
     }
 
     // 4. DeepSeek API 호출
