@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Calendar, Activity, List, Settings, PlusCircle } from 'lucide-react'
+import { Calendar, Activity, List, Settings, PlusCircle, Sparkles } from 'lucide-react'
 import clsx from 'clsx'
 
 export default function Navigation() {
@@ -12,6 +12,7 @@ export default function Navigation() {
     { name: 'Running', href: '/running', icon: Activity },
     { name: 'Calendar', href: '/calendar', icon: Calendar },
     { name: 'Workouts', href: '/workouts', icon: List },
+    { name: 'AI Coach', href: '/ai', icon: Sparkles },
     { name: 'Settings', href: '/settings', icon: Settings },
   ]
 
