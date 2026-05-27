@@ -32,7 +32,6 @@ export default async function StatsPage() {
     Rest: 'from-slate-350 to-slate-500',
     Tennis: 'from-lime-400 to-emerald-500',
     Other: 'from-stone-400 to-stone-500',
-    'Shoulder, Arm': 'from-cyan-400 to-blue-500',
   }
 
   return (

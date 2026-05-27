@@ -20,8 +20,6 @@ const artworkThemes: Record<string, { bg: string; text: string; label: string }>
   Rest: { bg: '#e0e7ff', text: '#3730a3', label: 'REST' },
   Tennis: { bg: '#dcfce7', text: '#166534', label: 'TENNIS' },
   Other: { bg: '#f1f5f9', text: '#334155', label: 'OTHER' },
-  'Shoulder, Arm': { bg: '#e0f2fe', text: '#0369a1', label: 'ARM' },
-  'Shoulder, arm': { bg: '#e0f2fe', text: '#0369a1', label: 'ARM' },
 }
 
 export default function WorkoutArtwork({ type, status = 'completed', size = 'md', className }: Props) {

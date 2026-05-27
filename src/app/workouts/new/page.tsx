@@ -1,4 +1,5 @@
 import WorkoutForm from '@/components/WorkoutForm'
+import { getDbPresets } from '@/lib/workouts/exercises-repository'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
@@ -9,6 +10,7 @@ interface Props {
 export default async function NewWorkoutPage(props: Props) {
   const searchParams = await props.searchParams
   const date = searchParams.date
+  const presets = await getDbPresets()
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 pb-24">
@@ -27,7 +29,7 @@ export default async function NewWorkoutPage(props: Props) {
         </div>
       </header>
 
-      <WorkoutForm initialDate={date} />
+      <WorkoutForm initialDate={date} initialPresets={presets} />
     </div>
   )
 }

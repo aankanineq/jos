@@ -1,15 +1,32 @@
 import { getWorkoutByDate } from '@/lib/workouts/repository'
-import { ArrowLeft, Edit2, Calendar } from 'lucide-react'
+import { getExercisesByWorkoutId } from '@/lib/workouts/exercises-repository'
+import { ArrowLeft, Edit2, Calendar, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 import { format } from 'date-fns'
 import DeleteWorkoutButton from '@/components/DeleteWorkoutButton'
 import WorkoutArtwork from '@/components/WorkoutArtwork'
+import { STRENGTH_TYPES } from '@/lib/workouts/exercise-presets'
+
+function formatSetWeight(isBodyweight: boolean, weightKg: number | null) {
+  if (isBodyweight) {
+    return weightKg == null ? 'BW' : `BW + ${weightKg}kg`
+  }
+  return weightKg == null ? '-' : `${weightKg}kg`
+}
 
 export default async function DailyWorkoutPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
   const dateStrParam = params.id
   const workouts = await getWorkoutByDate(dateStrParam)
+
+  // Fetch exercises for each workout
+  const workoutsWithExercises = await Promise.all(
+    workouts.map(async (w) => {
+      const exercises = await getExercisesByWorkoutId(w.id)
+      return { ...w, exercises }
+    })
+  )
 
   const dateStr = format(new Date(dateStrParam), 'yyyy년 M월 d일')
 
@@ -31,7 +48,7 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
         </div>
       </header>
 
-      {workouts.length === 0 ? (
+      {workoutsWithExercises.length === 0 ? (
         <div className="retro-card p-12 text-center bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
           <p className="text-slate-500 mb-6 font-semibold">이 날짜에 기록된 운동이 없습니다.</p>
           <Link
@@ -43,7 +60,7 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
         </div>
       ) : (
         <div className="space-y-8">
-          {workouts.map((workout) => (
+          {workoutsWithExercises.map((workout) => (
             <article
               key={workout.id}
               className="retro-card overflow-hidden bg-white border border-slate-100/80 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.03)]"
@@ -117,12 +134,77 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
                 </div>
               )}
 
+              {/* ── Structured Exercises Display ── */}
+              {workout.exercises && workout.exercises.length > 0 && (
+                <div className="px-6 sm:px-8 py-5 border-b border-slate-100 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Dumbbell className="w-4 h-4 text-slate-500" />
+                    <h3 className="text-sm font-extrabold text-slate-800 tracking-tight">세부 종목 기록</h3>
+                    <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase ml-auto">
+                      {workout.exercises.length}개 종목
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {workout.exercises.map((exercise) => (
+                      <div
+                        key={exercise.id}
+                        className="bg-slate-50/50 border border-slate-100 rounded-2xl p-4"
+                      >
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <span className="text-[10px] font-black text-slate-400 bg-white rounded-lg w-6 h-6 flex items-center justify-center border border-slate-100 shrink-0">
+                            {exercise.exercise_order}
+                          </span>
+                          <h4 className="text-sm font-extrabold text-slate-900 tracking-tight">
+                            {exercise.exercise_name}
+                          </h4>
+                          {exercise.is_bodyweight && (
+                            <span className="text-[9px] font-black text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                              BW
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Sets Table */}
+                        <div className="space-y-1">
+                          {exercise.exercise_sets.map((set) => (
+                            <div
+                              key={set.id}
+                              className="flex items-center gap-3 text-xs py-1"
+                            >
+                              <span className="text-[10px] font-bold text-slate-400 w-8 text-right">
+                                세트{set.set_number}
+                              </span>
+                              <span className="font-bold text-slate-700 w-24 text-center">
+                                {formatSetWeight(exercise.is_bodyweight, set.weight_kg)}
+                              </span>
+                              <span className="text-slate-400 font-bold">×</span>
+                              <span className="font-extrabold text-slate-900">
+                                {set.reps}회
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {exercise.notes && (
+                          <p className="mt-2 text-[11px] font-semibold text-slate-500 leading-relaxed">
+                            📝 {exercise.notes}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Markdown Content */}
               <div className="p-6 sm:p-8 prose max-w-none prose-headings:font-extrabold prose-headings:text-slate-950 prose-p:text-slate-600 prose-p:font-semibold prose-p:leading-relaxed prose-li:text-slate-600 prose-li:font-semibold prose-pre:bg-slate-50/60 prose-pre:border prose-pre:border-slate-100 prose-pre:rounded-2xl">
                 {workout.markdown ? (
                   <ReactMarkdown>{workout.markdown}</ReactMarkdown>
                 ) : (
-                  <p className="text-slate-400 italic font-medium">상세 기록이 작성되지 않았습니다.</p>
+                  !workout.exercises?.length && (
+                    <p className="text-slate-400 italic font-medium">상세 기록이 작성되지 않았습니다.</p>
+                  )
                 )}
               </div>
             </article>
@@ -132,4 +214,3 @@ export default async function DailyWorkoutPage(props: { params: Promise<{ id: st
     </div>
   )
 }
-

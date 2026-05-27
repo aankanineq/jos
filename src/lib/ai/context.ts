@@ -1,4 +1,4 @@
-import { WorkoutEntry } from '@/lib/types'
+import { WorkoutEntry, ExerciseHistoryEntry } from '@/lib/types'
 
 // ── Quest Definitions (러닝 퀘스트 시스템 상수, running/page.tsx와 동일) ──
 
@@ -217,19 +217,129 @@ export function formatRecentWorkoutsForAI(workouts: WorkoutEntry[]): string {
 
 // ── User Profile ──
 
-export interface UserProfile {
-  runningGoal: string
-  shoes: string
-  trainingDays: string
-  physicalNotes: string
+export type ProfileItem = {
+  item_id: string;
+  item_label: string;
+  item_value: string;
+  item_order: number;
+};
+
+export function formatProfileForAI(profile: ProfileItem[]): string {
+  if (!profile || profile.length === 0) return ''
+  const parts = profile
+    .filter((item) => item.item_label.trim() && item.item_value.trim())
+    .map((item) => `- ${item.item_label.trim()}: ${item.item_value.trim()}`)
+  if (parts.length === 0) return ''
+  return '## 사용자 개인 프로필 (AI-RAG Context)\n\n' + parts.join('\n') + '\n'
 }
 
-export function formatProfileForAI(profile: UserProfile): string {
-  const parts: string[] = []
-  if (profile.runningGoal) parts.push(`- 러닝 목표: ${profile.runningGoal}`)
-  if (profile.shoes) parts.push(`- 러닝화: ${profile.shoes}`)
-  if (profile.trainingDays) parts.push(`- 선호 훈련 요일: ${profile.trainingDays}`)
-  if (profile.physicalNotes) parts.push(`- 특이사항: ${profile.physicalNotes}`)
-  if (parts.length === 0) return ''
-  return '## 사용자 개인 프로필\n\n' + parts.join('\n') + '\n'
+export function formatGymDataForAI(history: ExerciseHistoryEntry[]): string {
+  if (history.length === 0) return '근력 운동 기록이 없습니다.'
+
+  const groups: Record<string, {
+    name: string
+    is_bodyweight: boolean
+    workout_type: string
+    entries: ExerciseHistoryEntry[]
+  }> = {}
+
+  for (const entry of history) {
+    const groupId = entry.exercise_key || `name_${entry.exercise_name.trim().toLowerCase()}`
+    if (!groups[groupId]) {
+      groups[groupId] = {
+        name: entry.exercise_name,
+        is_bodyweight: entry.is_bodyweight,
+        workout_type: entry.workout_type,
+        entries: []
+      }
+    }
+    groups[groupId].entries.push(entry)
+  }
+
+  let text = '## 근력 운동 종목별 히스토리 요약\n\n'
+
+  for (const [groupId, group] of Object.entries(groups)) {
+    text += `### ${group.name} (${group.workout_type} 계열${group.is_bodyweight ? ', 맨몸/추가중량 운동' : ''})\n`
+    
+    let peakWeight = 0
+    let peakReps = 0
+    let maxVolume = 0
+    let maxAddedWeight = 0
+    let totalSets = 0
+    let estimatedMax1RM = 0
+    let estimatedMaxAdded1RM = 0
+
+    const sortedEntries = [...group.entries].sort((a, b) => a.workout_date.localeCompare(b.workout_date))
+
+    for (const session of sortedEntries) {
+      let sessionVolume = 0
+      for (const set of session.exercise_sets) {
+        totalSets++
+        if (set.reps > peakReps) peakReps = set.reps
+        
+        if (group.is_bodyweight) {
+          if (set.weight_kg !== null) {
+            if (set.weight_kg > maxAddedWeight) maxAddedWeight = set.weight_kg
+            const added1RM = set.weight_kg * (1 + set.reps / 30)
+            if (added1RM > estimatedMaxAdded1RM) estimatedMaxAdded1RM = added1RM
+          }
+        } else {
+          if (set.weight_kg !== null) {
+            if (set.weight_kg > peakWeight) peakWeight = set.weight_kg
+            sessionVolume += set.weight_kg * set.reps
+            const oneRepMax = set.weight_kg * (1 + set.reps / 30)
+            if (oneRepMax > estimatedMax1RM) estimatedMax1RM = oneRepMax
+          }
+        }
+      }
+      if (sessionVolume > maxVolume) maxVolume = sessionVolume
+    }
+
+    if (group.is_bodyweight) {
+      text += `- 최대 추가 중량: ${maxAddedWeight > 0 ? `${maxAddedWeight}kg` : '맨몸(0kg)'}\n`
+      if (maxAddedWeight > 0 && estimatedMaxAdded1RM > 0) {
+        text += `- 추정 추가 중량 1RM: ${estimatedMaxAdded1RM.toFixed(1)}kg\n`
+      }
+    } else {
+      text += `- 최고 중량: ${peakWeight}kg\n`
+      if (estimatedMax1RM > 0) {
+        text += `- 추정 1RM: ${estimatedMax1RM.toFixed(1)}kg\n`
+      }
+      text += `- 단일 세션 최대 볼륨: ${maxVolume}kg\n`
+    }
+    text += `- 최고 반복 횟수: ${peakReps}회\n`
+    text += `- 총 세트 수행 횟수: ${totalSets}세트\n`
+
+    text += `\n* 최근 3회 수행 내역:\n`
+    const recentSessions = [...group.entries].sort((a, b) => b.workout_date.localeCompare(a.workout_date)).slice(0, 3)
+    recentSessions.forEach((session) => {
+      const setsStr = session.exercise_sets.map(s => `${s.weight_kg !== null ? `${s.weight_kg}kg ` : ''}${s.reps}회`).join(' / ')
+      text += `  - ${session.workout_date}: ${setsStr}${session.notes ? ` (메모: ${session.notes})` : ''}\n`
+    })
+    text += '\n'
+  }
+
+  return text
 }
+
+export function formatGymProfileForAI(profile: ProfileItem[]): string {
+  if (!profile || profile.length === 0) return ''
+  const parts = profile
+    .filter((item) => item.item_label.trim() && item.item_value.trim())
+    .map((item) => `- ${item.item_label.trim()}: ${item.item_value.trim()}`)
+  if (parts.length === 0) return ''
+  return '## 사용자 개인 헬스 프로필 (AI-RAG Context)\n\n' + parts.join('\n') + '\n'
+}
+
+export function getUniqueMonths<T extends { workout_date?: string; date?: string }>(
+  items: T[]
+): string[] {
+  const months = new Set<string>();
+  for (const item of items) {
+    const date = item.workout_date ?? item.date;
+    if (!date || date.length < 7) continue;
+    months.add(date.slice(0, 7));
+  }
+  return Array.from(months).sort((a, b) => b.localeCompare(a));
+}
+

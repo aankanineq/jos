@@ -1,5 +1,6 @@
 import WorkoutForm from '@/components/WorkoutForm'
 import { getWorkoutById } from '@/lib/workouts/repository'
+import { getExercisesByWorkoutId, getDbPresets } from '@/lib/workouts/exercises-repository'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -11,6 +12,10 @@ export default async function EditWorkoutPage(props: { params: Promise<{ id: str
   if (!workout) {
     notFound()
   }
+
+  // Fetch exercises for this workout
+  const exercises = await getExercisesByWorkoutId(workout.id)
+  const presets = await getDbPresets()
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 pb-24">
@@ -29,7 +34,7 @@ export default async function EditWorkoutPage(props: { params: Promise<{ id: str
         </div>
       </header>
 
-      <WorkoutForm initialData={workout} />
+      <WorkoutForm initialData={workout} initialExercises={exercises} initialPresets={presets} />
     </div>
   )
 }

@@ -31,7 +31,6 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
       - Tennis (테니스)
       - Rest (휴식)
       - Other (기타)
-      - Shoulder, Arm (어깨팔 - 어깨/이두/삼두)
    • 🚨 절대 허용하지 않는 예외 대상 (Invalid Header Cases):
      - 대괄호나 특수 기호가 날짜에 붙는 경우 (예: ## [2026-05-21] Running ❌)
      - 한글 운동 종류명이 섞인 경우 (예: ## 2026-05-21 러닝 ❌)
@@ -51,7 +50,7 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
    • 상세한 운동 일지 및 수행 내역은 반드시 'memo: ...' 메타데이터 키를 사용하여 한 줄로 정교하게 작성해야 합니다.
    • JOS v1 Spec은 메타데이터 블록 아래 빈 줄 뒤의 자유 형식 본문 기입을 지원하지 않습니다.
    • 🚨 근력 운동군 필수 규칙:
-      - Pull, Push, Leg, Full, Shoulder, Arm 종류의 completed(완료됨) 운동은 'memo' 필드가 필수입니다.
+      - Pull, Push, Leg, Full 종류의 completed(완료됨) 운동은 'memo' 필드가 필수입니다.
       - memo 속성이 누락되거나 내용이 공백인 경우 invalid 오류가 발생합니다.
       - planned(예정됨)일 때는 memo 필드가 선택사항입니다.
     • 🚨 기타 운동군 규칙:
@@ -74,7 +73,7 @@ const FULL_IMPORT_TEMPLATE = `# [JOS 마크다운 백업 가져오기 가이드 
    • 🚨 러닝 계획(Running + planned) 요건:
      - running_distance_km 및 duration 속성은 자유로운 선택 사항입니다.
    • 🚨 러닝 이외 운동군(비-러닝 운동) 엄격 보호:
-      - Pull, Push, Leg, Full, Tennis, Rest, Other, Shoulder, Arm 세션에는 거리(running_distance_km), 시간(duration), 페이스 필드를 절대 입력할 수 없습니다.
+      - Pull, Push, Leg, Full, Tennis, Rest, Other 세션에는 거리(running_distance_km), 시간(duration), 페이스 필드를 절대 입력할 수 없습니다.
      - 기입 시 유효성 검사에서 invalid 오류가 발생합니다.
      - 강도(running_intensity) 필드는 시스템 전체에서 전면 소거되어, 기입 시 무시 혹은 invalid 처리됩니다.
 
@@ -153,11 +152,7 @@ memo: 근육통 회복을 위한 스트레칭 및 휴식.
 status: completed
 memo: 실내 자전거 40분 완료.
 
----
-
-## 2026-05-28 Shoulder, Arm
-status: completed
-memo: 사래레 12kg 15회 5세트, 바벨컬 30kg 12회 4세트 완료.`
+---`
 
 interface SettingsClientProps {
   uniqueMonths: string[]
@@ -167,7 +162,7 @@ const WORKOUT_TYPES = [
   { id: 'Pull', label: '💪 풀 (Pull)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
   { id: 'Push', label: '🔥 푸쉬 (Push)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
   { id: 'Leg', label: '🦵 레그 (Leg)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
-  { id: 'Shoulder, Arm', label: '🎯 어깨팔 (Shoulder, Arm)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
+
   { id: 'Full', label: '🏋️ 전신 (Full)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
   { id: 'Running', label: '🏃 러닝 (Running)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
   { id: 'Tennis', label: '🎾 테니스 (Tennis)', color: 'border-slate-100 bg-slate-50/50 text-slate-600 hover:bg-slate-50' },
